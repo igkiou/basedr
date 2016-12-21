@@ -1,0 +1,16 @@
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(1) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(2) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(3) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(4) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(5) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(6) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(7) = etime(c2,c1);
+c1 = clock; im55 = renderImage_geometric(13.89, 1000000); c2 = clock;
+t(8) = etime(c2,c1);

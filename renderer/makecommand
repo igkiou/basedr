@@ -1,0 +1,15 @@
+g++ -DUSE_THREADED -Wall -Wextra -g -W -pedantic -march=native -O3 -fopenmp -pthread -I /usr/include/boost/ -I /usr/include/OpenEXR/ -I ../include/ renderer_sample.cpp -lIlmImf -lIex ../src/image.cpp ../src/phase.cpp ../src/photon.cpp ../src/scene.cpp
+
+g++ -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -Wall -Wextra -g -W -pedantic -march=native -O3 -ffast-math -fopenmp -pthread -I /usr/include/boost/ -I /usr/include/OpenEXR/ -I ../include/ renderer_sample.cpp -lIlmImf -lIex ../src/image.cpp ../src/phase.cpp ../src/photon.cpp ../src/scene.cpp ../src/sampler.cpp
+
+icpc -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -g -Wall -Wunused-variable -Wcheck -Wextra-tokens -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wpointer-arith -Wreturn-type -Wsign-compare -Wuninitialized -axSSE3,SSE4.1,SSE4.2,AVX -O3 -pipe -ipo -fast -parallel -openmp -pthread -I /usr/include/boost/ -I ../include/ renderer_sample.cpp ../src/image.cpp ../src/phase.cpp ../src/photon.cpp ../src/scene.cpp ../src/sampler.cpp > ~/temp.txt 2>&1
+
+icpc -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -g -Wall -Wunused-variable -Wcheck -Wextra-tokens -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wpointer-arith -Wreturn-type -Wsign-compare -Wuninitialized -axSSE3,SSE4.1,SSE4.2,AVX -O3 -pipe -ipo -fast -fp-model fast=2 -no-prec-sqrt -parallel -openmp -pthread -I /usr/include/boost/ -I ../include/ renderer_sample.cpp ../src/image.cpp ../src/phase.cpp ../src/photon.cpp ../src/scene.cpp ../src/sampler.cpp
+
+icpc -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -g -Wall -Wunused-variable -Wcheck -Wextra-tokens -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wpointer-arith -Wreturn-type -Wsign-compare -Wuninitialized -axSSE3,SSE4.1,SSE4.2,AVX -O3 -pipe -ipo -fast -parallel -openmp -pthread -I /usr/include/boost/ -I ../include/ -I /usr/local/cuda/include/ -L/usr/local/cuda/lib/ -lcurand -lcuda -lcudart test_sampler.cpp ../src/sampler.cpp
+
+g++ -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -Wall -Wextra -g -W -pedantic -march=native -O3 -ffast-math -fopenmp -pthread -I /usr/include/boost/ -I /usr/include/OpenEXR/ -I ../include/ -I /usr/local/cuda/include/ -lIlmImf -lIex -L/usr/local/cuda/lib64/ -lcurand -lcuda -lcudart test_sampler.cpp ../src/sampler.cpp -o test_sampler
+
+g++ -DUSE_CUDA -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -Wall -Wextra -g -W -pedantic -march=native -O3 -ffast-math -fopenmp -pthread -I /usr/include/boost/ -I /usr/include/OpenEXR/ -I ../include/ -I /usr/local/cuda/include/ -L/usr/local/cuda-5.0/lib64/ -lcurand -lcuda -lcudart test_sampler.cpp ../src/sampler.cpp -o test_sampler
+
+icpc -DUSE_CUDA -DUSE_THREADED -DUSE_NO_FRESNEL -DUSE_NO_OPENEXR -g -Wall -Wunused-variable -Wcheck -Wextra-tokens -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wpointer-arith -Wreturn-type -Wsign-compare -Wuninitialized -axSSE3,SSE4.1,SSE4.2,AVX -O3 -pipe -ipo -fast -parallel -openmp -pthread -I /usr/include/boost/ -I ../include/ -I /usr/local/cuda/include/ -L/usr/local/cuda/lib64/ -lcurand -lcuda -lcudart test_sampler.cpp ../src/sampler.cpp -o test_sampler

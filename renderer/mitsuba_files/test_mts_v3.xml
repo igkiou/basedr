@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+	Automatically converted from COLLADA
+
+-->
+<scene version="0.3.0">
+	<integrator type="volpath_simple">
+		<integer name="maxDepth" value="-1"/>
+	</integrator>
+
+<!--
+	<luminaire type="envmap">
+		<string name="filename" value="env_maps/ennis_verylowres.exr"/>
+		<float name="intensityScale" value="0.2"/>
+		<transform name="toWorld">
+			<rotate x="0" y="1" z="0" angle="180"/>
+			<rotate x="1" y="0" z="0" angle="90"/>
+			<matrix value="-0.999992 0.003903 -0.000818 0 0.003987 0.974432 -0.224646 0 -0.000080 -0.224647 -0.974440 0 0 0 0 1"/>
+			<rotate x="1" y="0" z="0" angle="150"/>
+			<rotate x="0" y="1" z="0" angle="180"/>
+			<rotate x="1" y="0" z="0" angle="220"/>
+		</transform>
+	</luminaire>
+-->
+
+	<luminaire type="collimated">
+		<spectrum name="intensity" value="1000000.0"/>
+		<float name="radius" value="10000"/>
+		<transform name="toWorld">
+			<scale x="-1"/>
+			<lookAt origin="0 $lightOY, $lightOZ" target="0, $lightDY, $lightDZ"/>
+		</transform>
+	</luminaire>
+	
+	<medium type="homogeneous" id="med">
+		<float name="densityMultiplier" value="$density"/>
+		<spectrum name="sigmaA" value="$sigmaA"/>
+		<spectrum name="sigmaS" value="$sigmaS"/>
+		<phase type="hg2" id="hg2">
+			<float name="g" value="$g"/>
+			<float name="g2" value="$bg"/>
+			<float name="weight" value="$weight"/>
+		</phase>
+	</medium>
+
+	<shape type="obj">
+			<string name="filename" value="meshes/wedge_equal.obj"/>
+			<boolean name="faceNormals" value="true"/>
+		<ref name="interior" id="med"/>
+		<transform name="toWorld">
+			<rotate x="1" y="0" z="0" angle="90"/>
+			<rotate x="0" y="1" z="0" angle="$yangle"/>
+			<rotate x="0" y="0" z="1" angle="$zangle"/>
+			<translate x="0" y="0" z="0"/>
+		</transform>
+	</shape>
+
+	<camera type="perspective" id="orthographic" >
+		<float name="fov" value="$fov"/>
+		<float name="nearClip" value="1.0"/>
+		<float name="farClip" value="10000"/>
+		<transform name="toWorld">
+			<scale x="-1"/>
+			<lookAt origin="0, 0, $wd" target="0, 0, 1"/>
+		</transform>
+		<sampler id="sampler" type="ldsampler">
+			<integer name="sampleCount" value="$numSamples"/>
+		</sampler>
+		<film id="film" type="exrfilm">
+			<integer name="width" value="512"/>
+			<integer name="height" value="512"/>
+
+			<rfilter type="gaussian"/>
+			<boolean name="banner" value="false"/>
+		</film>
+	</camera>
+	
+</scene>
+

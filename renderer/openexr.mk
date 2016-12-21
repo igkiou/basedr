@@ -1,0 +1,10 @@
+OPENEXRDIR = /usr/lib
+ifeq ($(USE_STATIC), 1)
+	OPENEXRLIBS = $(OPENEXRDIR)/libIlmImf.a $(OPENEXRDIR)/libIex.a
+else
+	OPENEXRLIBS = -L$(OPENEXRDIR) -lIlmImf -lIex
+endif
+LIBS += $(OPENEXRLIBS)
+
+OPENEXRINCLUDE= -I /usr/include/OpenEXR
+INCLUDES += $(OPENEXRINCLUDE)
