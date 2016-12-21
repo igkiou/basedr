@@ -31,22 +31,7 @@ public:
 
 	void scatter(const tvec::Vec3f &p, const tvec::Vec3f &d,
 				const scn::Scene &scene, const med::Medium &medium,
-				smp::Sampler &sampler,
-				tvec::Vec3fBuffer &buf_pos, tvec::Vec3fBuffer &buf_dir, int &depth) const;
-
-	void scatter(const tvec::Vec3f &p, const tvec::Vec3f &d,
-				const scn::Scene &scene, const med::Medium &medium,
-				smp::Sampler &sampler,
-				tvec::Vec3fBuffer &buf_pos, tvec::Vec3fBuffer &buf_dir) const;
-
-	void scatter(const tvec::Vec3f &p, const tvec::Vec3f &d,
-				const scn::Scene &scene, const med::Medium &medium,
 				smp::Sampler &sampler, image::SmallImage &img, Float weight) const;
-
-	void scatter2(const tvec::Vec3f &p, const tvec::Vec3f &d,
-				const scn::Scene &scene, const med::Medium &medium,
-				const med::Medium &mediumSingle, smp::Sampler &sampler,
-				image::SmallImage &img, Float weight, const Float pfSampleLF) const;
 
 	bool scatterOnce(tvec::Vec3f &p, tvec::Vec3f &d, const scn::Scene &scene,
 				const med::Medium &medium, smp::Sampler &sampler) const;

@@ -91,9 +91,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	const med::Medium medium(sigmaT, albedo, phase);
 	const scn::SampleScene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
 	image::SmallImage img0(viewReso.x, viewReso.y);
-	tvec::Vec3fStorage field_pos(0);
-	tvec::Vec3fStorage field_dir(0);
-	Float foo = FPCONST(0.0);
 
 	photon::Renderer renderer(maxDepth, useDirect);
 	renderer.renderImage(img0, medium, scene, numPhotons);

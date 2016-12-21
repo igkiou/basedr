@@ -114,4 +114,23 @@ SmallImageSet::~SmallImageSet()  {
 	delete[] m_images;
 }
 
+void SmallImageStackSet::mergeImages(SmallImageStack &mergedImage) const {
+	Assert(mergedImage.getXRes() == m_xRes && mergedImage.getYRes() == m_yRes && mergedImage.getZRes() == m_zRes);
+	for (int h = 0; h < m_zRes; ++h) {
+		for (int i = 0; i < m_yRes; ++i) {
+			for (int j = 0; j < m_xRes; ++j) {
+				float val = 0.0f;
+				for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
+					val += m_images[iterImage].getPixel(j, i, h);
+				}
+				mergedImage.setPixel(j, i, h, val);
+			}
+		}
+	}
+}
+
+SmallImageStackSet::~SmallImageStackSet()  {
+	delete[] m_images;
+}
+
 }	/* namespace image */
