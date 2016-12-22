@@ -5,11 +5,8 @@ function params = sceneparams(varargin)
 params.iorMedium = 1.3;
 params.mediumDimensions = [2.5; 34; 22];
 % params.mediumDimensions = [2.5; 100; 100];
-params.iorContainer = 1.5;
-params.containerDimensions = [8.5; 40; 28];
-% params.containerDimensions = [8.5; 106; 106];
 
-params.rayOrigin = [-params.containerDimensions(1) / 2; 0.0; 0.0];
+params.rayOrigin = [-params.mediumDimensions(1) / 2; 0.0; 0.0];
 params.rayDir = normvec([1; -1; 0]);
 params.rayRadius = 0.5;
 params.Li = 75000.0;

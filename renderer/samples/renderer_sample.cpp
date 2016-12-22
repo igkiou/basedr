@@ -57,7 +57,7 @@ int main() {
 	printf("Li = %.2f\n", Li);
 
 	const med::Medium medium(sigmaT, albedo, phase);
-	const scn::SampleScene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
+	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
 	image::SmallImage img0(viewReso.x, viewReso.y);
 
 	photon::Renderer renderer(maxDepth, useDirect);

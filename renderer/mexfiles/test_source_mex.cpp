@@ -102,7 +102,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 //	const bool useContinuous = (useContinuousd > 0);
 
 //	const med::Medium medium(sigmaT, sigmaS, phase);
-	const scn::SampleScene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
+	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
 	plhs[0] = mxCreateNumericMatrix(3, numPhotons, mxDOUBLE_CLASS, mxREAL); /* x */
 	Float *srcPos = (Float *) mxGetData(plhs[0]);
 	plhs[1] = mxCreateNumericMatrix(3, numPhotons, mxDOUBLE_CLASS, mxREAL); /* x */

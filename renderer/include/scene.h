@@ -230,103 +230,23 @@ protected:
 class Scene {
 public:
 	Scene(const Float mediumIor,
-		const tvec::Vec3f &mediumBlockL,
-		const tvec::Vec3f &mediumBlockR,
-		const tvec::Vec3f &rayOrigin,
-		const tvec::Vec3f &rayDir,
-		const Float rayRadius,
-		const Float Li,
-		const tvec::Vec2f &viewOrigin,
-		const tvec::Vec3f &viewDir,
-		const tvec::Vec3f &viewY,
-		const tvec::Vec2f &viewPlane)
-		: m_mediumIor(mediumIor),
-		  m_fresnelTrans(FPCONST(1.0)),
-		  m_refrDir(FPCONST(1.0), FPCONST(0.0), FPCONST(0.0)),
-		  m_mediumBlock(mediumBlockL, mediumBlockR),
-		  m_source(rayOrigin, rayDir, rayRadius, Li),
-		  m_camera(viewOrigin, viewDir, viewY, viewPlane) {	}
-
-	/*
-	 * TODO: Inline these methods in implementations.
-	 */
-	virtual bool movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const = 0;
-	virtual bool movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, tvec::Vec3fBuffer &pbuff, tvec::Vec3fBuffer &dbuff) const = 0;
-	virtual bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler) const = 0;
-	virtual bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler, tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const = 0;
-	void addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float val) const;
-
-	inline void addPixel(image::SmallImage &img, int x, int y, Float val) const {
-
-		if (x >= 0 && x < img.getXRes() && y >= 0 && y < img.getYRes()) {
-			img.addEnergy(x, y, static_cast<float>(val));
-		}
-	}
-
-	virtual void addEnergy(image::SmallImage &img, const tvec::Vec3f &p,
-						const tvec::Vec3f &d, Float val,
-						const med::Medium &medium) const = 0;
-
-	virtual void addEnergyDirect(image::SmallImage &img, const tvec::Vec3f &p,
-						const tvec::Vec3f &d, Float val,
-						const med::Medium &medium) const = 0;
-
-	inline Float getMediumIor() const {
-		return m_mediumIor;
-	}
-
-	inline Float getFresnelTrans() const {
-		return m_fresnelTrans;
-	}
-
-	inline const tvec::Vec3f& getRefrDir() const {
-		return m_refrDir;
-	}
-
-	inline const Block& getMediumBlock() const {
-		return m_mediumBlock;
-	}
-
-	inline const RaySource& getRaySource() const {
-		return m_source;
-	}
-
-	virtual ~Scene() { }
-
-protected:
-	Float m_mediumIor;
-	Float m_fresnelTrans;
-	tvec::Vec3f m_refrDir;
-	Block m_mediumBlock;
-	RaySource m_source;
-	Camera m_camera;
-};
-
-class SampleScene : public Scene {
-public:
-	SampleScene(const Float mediumIor,
-				const tvec::Vec3f &mediumBlockL,
-				const tvec::Vec3f &mediumBlockR,
-				const tvec::Vec3f &rayOrigin,
-				const tvec::Vec3f &rayDir,
-				const Float rayRadius,
-				const Float Li,
-				const tvec::Vec2f &viewOrigin,
-				const tvec::Vec3f &viewDir,
-				const tvec::Vec3f &viewY,
-				const tvec::Vec2f &viewPlane)
-			: Scene(mediumIor,
-					mediumBlockL,
-					mediumBlockR,
-					rayOrigin,
-					rayDir,
-					rayRadius,
-					Li,
-					viewOrigin,
-					viewDir,
-					viewY,
-					viewPlane),
-			m_bsdf(FPCONST(1.0), mediumIor) {
+			const tvec::Vec3f &mediumBlockL,
+			const tvec::Vec3f &mediumBlockR,
+			const tvec::Vec3f &rayOrigin,
+			const tvec::Vec3f &rayDir,
+			const Float rayRadius,
+			const Float Li,
+			const tvec::Vec2f &viewOrigin,
+			const tvec::Vec3f &viewDir,
+			const tvec::Vec3f &viewY,
+			const tvec::Vec2f &viewPlane) :
+				m_mediumIor(mediumIor),
+				m_fresnelTrans(FPCONST(1.0)),
+				m_refrDir(FPCONST(1.0), FPCONST(0.0), FPCONST(0.0)),
+				m_mediumBlock(mediumBlockL, mediumBlockR),
+				m_source(rayOrigin, rayDir, rayRadius, Li),
+				m_camera(viewOrigin, viewDir, viewY, viewPlane),
+				m_bsdf(FPCONST(1.0), mediumIor) {
 
 		Assert(((std::abs(m_source.getOrigin().x - m_mediumBlock.getBlockL().x) < M_EPSILON) && (m_source.getDir().x > FPCONST(0.0)))||
 				((std::abs(m_source.getOrigin().x - m_mediumBlock.getBlockR().x) < M_EPSILON) && (m_source.getDir().x < FPCONST(0.0))));
@@ -378,20 +298,51 @@ public:
 #endif
 	}
 
-
+	/*
+	 * TODO: Inline these methods in implementations.
+	 */
 	bool movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const;
-//	inline bool movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, tvec::Vec3fBuffer &pbuff, tvec::Vec3fBuffer &dbuff) const {
 	inline bool movePhoton(tvec::Vec3f &, tvec::Vec3f &, Float , tvec::Vec3fBuffer &, tvec::Vec3fBuffer &) const {
 		return false;
 	}
 	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler) const;
 	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler, tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const;
+	void addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float val) const;
+
+	inline void addPixel(image::SmallImage &img, int x, int y, Float val) const {
+
+		if (x >= 0 && x < img.getXRes() && y >= 0 && y < img.getYRes()) {
+			img.addEnergy(x, y, static_cast<float>(val));
+		}
+	}
+
 	void addEnergy(image::SmallImage &img, const tvec::Vec3f &p,
-				const tvec::Vec3f &d, Float val,
-				const med::Medium &medium) const;
+						const tvec::Vec3f &d, Float val,
+						const med::Medium &medium) const;
+
 	void addEnergyDirect(image::SmallImage &img, const tvec::Vec3f &p,
-				const tvec::Vec3f &d, Float val,
-				const med::Medium &medium) const;
+						const tvec::Vec3f &d, Float val,
+						const med::Medium &medium) const;
+
+	inline Float getMediumIor() const {
+		return m_mediumIor;
+	}
+
+	inline Float getFresnelTrans() const {
+		return m_fresnelTrans;
+	}
+
+	inline const tvec::Vec3f& getRefrDir() const {
+		return m_refrDir;
+	}
+
+	inline const Block& getMediumBlock() const {
+		return m_mediumBlock;
+	}
+
+	inline const RaySource& getRaySource() const {
+		return m_source;
+	}
 
 	inline const tvec::Vec3f& getRefX() const {
 		return m_refX;
@@ -405,12 +356,19 @@ public:
 		return m_refZ;
 	}
 
+	~Scene() { }
+
 protected:
+	Float m_mediumIor;
+	Float m_fresnelTrans;
+	tvec::Vec3f m_refrDir;
+	Block m_mediumBlock;
+	RaySource m_source;
+	Camera m_camera;
+	bsdf::SmoothDielectric m_bsdf;
 	tvec::Vec3f m_refX;
 	tvec::Vec3f m_refY;
 	tvec::Vec3f m_refZ;
-
-	bsdf::SmoothDielectric m_bsdf;
 };
 
 }	/* namespace scn */

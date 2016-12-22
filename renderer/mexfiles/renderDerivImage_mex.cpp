@@ -123,7 +123,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	const med::Medium medium(sigmaT, sigmaS, phase);
 	const med::Medium mediumSingle(sigmaTSingle, sigmaSSingle, phaseSingle);
-	const scn::SampleScene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
+	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
 	image::SmallImage img0(viewReso.x, viewReso.y);
 	if (useContinuous) {
 		photon::ContinuousRenderer renderer(maxDepth, useDirect);

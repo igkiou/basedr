@@ -1,13 +1,7 @@
 function params = rendererparams(varargin)
 %% 
-
-params.useContinuous = 0;	% always keep 0, except for debugging continuous deriv.
-params.useHybrid = 1;			% always keep 1, except for simulating reference using f-diff approximation.
-params.useLF = 0;				% always keep 0, deriv ignores it and uses it anyway.
 params.useDirect = 0;			% always keep 0, except for geometric.
 params.numPhotons = 500000;
-params.numPhotonsLF = 500000;
-params.hstep = 0.001;
 	
 % check for incorrect inputs
 if (mod(length(varargin), 2) ~= 0)

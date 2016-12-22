@@ -77,7 +77,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	tvec::Vec3f d((Float) iDir[0], (Float) iDir[1], (Float) iDir[2]);
 	const Float dist = (Float) distd;
 
-	const scn::SampleScene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
+	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
 
 	tvec::Vec3fBuffer pbuff(0);
 	tvec::Vec3fBuffer dbuff(0);

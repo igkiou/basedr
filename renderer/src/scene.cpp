@@ -76,7 +76,27 @@ bool RaySource::sampleRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &samp
 	return true;
 }
 
-bool SampleScene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
+bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
+						smp::Sampler &sampler) const {
+
+	if (m_source.sampleRay(pos, dir, sampler)) {
+		Float dist = FPCONST(0.0);
+		Assert(std::abs(dir.x) >= M_EPSILON);
+		if (dir.x >= M_EPSILON) {
+			dist = (m_mediumBlock.getBlockL().x - pos.x) / dir.x;
+		} else if (dir.x <= -M_EPSILON) {
+			dist = (m_mediumBlock.getBlockR().x - pos.x) / dir.x;
+		}
+		pos += dist * dir;
+//		pos.x += M_EPSILON * 2;
+		dir = m_refrDir;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
 						smp::Sampler &sampler, \
 						tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const {
 
@@ -98,27 +118,7 @@ bool SampleScene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
 	}
 }
 
-bool SampleScene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
-						smp::Sampler &sampler) const {
-
-	if (m_source.sampleRay(pos, dir, sampler)) {
-		Float dist = FPCONST(0.0);
-		Assert(std::abs(dir.x) >= M_EPSILON);
-		if (dir.x >= M_EPSILON) {
-			dist = (m_mediumBlock.getBlockL().x - pos.x) / dir.x;
-		} else if (dir.x <= -M_EPSILON) {
-			dist = (m_mediumBlock.getBlockR().x - pos.x) / dir.x;
-		}
-		pos += dist * dir;
-//		pos.x += M_EPSILON * 2;
-		dir = m_refrDir;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-//bool SampleScene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const {
+//bool Scene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const {
 //
 //	tvec::Vec3f p1 = p + dist * d;
 //	while (!m_mediumBlock.inside(p1)) {
@@ -152,7 +152,7 @@ bool SampleScene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
 //	return true;
 //}
 
-bool SampleScene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const {
+bool Scene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const {
 
 	tvec::Vec3f p1 = p + dist * d;
     tvec::Vec3f d1, norm;
@@ -171,18 +171,40 @@ bool SampleScene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sa
 		norm.zero();
 		for (i = 0; i < 3; ++i) {
 			if (std::abs(m_mediumBlock.getBlockL()[i] - p[i]) < M_EPSILON) {
-				norm[i] = -1.0f;
+				norm[i] = -FPCONST(1.0);
 				break;
 			}
 			else if (std::abs(m_mediumBlock.getBlockR()[i] - p[i]) < M_EPSILON) {
-				norm[i] = 1.0;
+				norm[i] = FPCONST(1.0);
 				break;
 			}
 		}
 		Assert(i < 3);
 
+		Float minDiff = M_MAX;
+		Float minDir = FPCONST(0.0);
+		tvec::Vec3f normalt;
+		normalt.zero();
+		int chosenI = 3;
+		for (i = 0; i < 3; ++i) {
+			Float diff = std::abs(m_mediumBlock.getBlockL()[i] - p[i]);
+			if (diff < minDiff) {
+				minDiff = diff;
+				chosenI = i;
+				minDir = -FPCONST(1.0);
+			}
+			diff = std::abs(m_mediumBlock.getBlockR()[i] - p[i]);
+			if (diff < minDiff) {
+				minDiff = diff;
+				chosenI = i;
+				minDir = FPCONST(1.0);
+			}
+		}
+		normalt[chosenI] = minDir;
+		Assert(normalt == norm);
+
         m_bsdf.sample(d, norm, sampler, d1);
-        if (tvec::dot(d1, norm) < 0.0f) {
+        if (tvec::dot(d1, norm) < FPCONST(0.0)) {
 			// re-enter the medium through reflection
 			d = d1;
 		} else {
@@ -227,7 +249,7 @@ void Scene::addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float
     }
 }
 
-void SampleScene::addEnergy(image::SmallImage &img, \
+void Scene::addEnergy(image::SmallImage &img, \
 			const tvec::Vec3f &p, const tvec::Vec3f &d, Float val, \
 			const med::Medium &medium) const {
 
@@ -264,7 +286,7 @@ void SampleScene::addEnergy(image::SmallImage &img, \
 	}
 }
 
-void SampleScene::addEnergyDirect(image::SmallImage &img, \
+void Scene::addEnergyDirect(image::SmallImage &img, \
 			const tvec::Vec3f &p, const tvec::Vec3f &d, Float val, \
 			const med::Medium &medium) const {
 

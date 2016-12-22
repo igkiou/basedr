@@ -3,14 +3,21 @@ sigmaT = 10;
 albedo = 0.99;
 gVal = 0.5;
 
-iorMedium = 1.2;
+iorMedium = 1;
 % mediumDimensions = [2 * 1.25, 2 * 27.5, 2 * 27.5];
-mediumDimensions = [2.5, 22, 34];
+mediumDimensions = [10, 10, 10];
 
-rayOrigin = [0.0 0.0];
+frontLighting = 0;
+rayAngle = 0;
+rayOriginOrig = [0.0; 0.0];
+if (frontLighting == 0) ,
+	rayOrigin = [-mediumDimensions(1) / 2; rayOriginOrig];
+else
+	rayOrigin = [mediumDimensions(1) / 2; rayOriginOrig];
+	rayAngle = rayAngle + 180;
+end;
 % rayAngle = -0.3927;
 % rayAngle = -0.7854;
-rayAngle = 0;
 rayDir = [cos(rayAngle); sin(rayAngle); 0];
 % rayDir = ones(3, 1); rayDir = normvec(rayDir);
 % rayDir = randn(3,1); rayDir = normvec(rayDir);
@@ -27,7 +34,7 @@ viewY = [0.0, 0.0, -1.0];
 viewPlane = [50, 50];
 viewReso = [128, 128];
 
-numPhotons = 50000000;
+numPhotons = 500000;
 useDirect = 0;
 
 %%

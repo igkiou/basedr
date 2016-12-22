@@ -51,6 +51,40 @@ void Renderer::scatter(const tvec::Vec3f &p, const tvec::Vec3f &d,
 	}
 }
 
+bool Renderer::scatterOnceWeight(tvec::Vec3f &p, tvec::Vec3f &d, Float &weight,
+						const scn::Scene &scene, const med::Medium &medium,
+						smp::Sampler &sampler) const {
+
+	weight *= medium.getAlbedo();
+	tvec::Vec3f d1;
+	medium.getPhaseFunction()->sample(d, sampler, d1);
+	d = d1;
+	Float dist = getMoveStep(medium, sampler);
+	return scene.movePhoton(p, d, dist, sampler);
+}
+
+void Renderer::scatterWeight(const tvec::Vec3f &p, const tvec::Vec3f &d,
+					const scn::Scene &scene, const med::Medium &medium,
+					smp::Sampler &sampler, image::SmallImage &img, Float weight) const {
+
+	Assert(scene.getMediumBlock().inside(p));
+	weight *= medium.getAlbedo();
+	tvec::Vec3f pos(p), dir(d);
+	Float dist = getMoveStep(medium, sampler);
+	if (!scene.movePhoton(pos, dir, dist, sampler)) {
+		return;
+	}
+	int depth = 0;
+	while (m_maxDepth < 0 || depth < m_maxDepth) {
+		++depth;
+		scene.addEnergy(img, pos, dir, weight, medium);
+
+		if (!scatterOnceWeight(pos, dir, weight, scene, medium, sampler)) {
+			break;
+		}
+	}
+}
+
 /**
  * Render an image.
  **/
