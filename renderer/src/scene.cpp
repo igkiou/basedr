@@ -76,7 +76,7 @@ bool RaySource::sampleRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &samp
 	return true;
 }
 
-bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
+bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir,
 						smp::Sampler &sampler) const {
 
 	if (m_source.sampleRay(pos, dir, sampler)) {
@@ -96,8 +96,8 @@ bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
 	}
 }
 
-bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
-						smp::Sampler &sampler, \
+bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir,
+						smp::Sampler &sampler,
 						tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const {
 
 	if (m_source.sampleRay(pos, dir, sampler)) {
@@ -152,7 +152,8 @@ bool Scene::genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, \
 //	return true;
 //}
 
-bool Scene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const {
+bool Scene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist,
+					smp::Sampler &sampler) const {
 
 	tvec::Vec3f p1 = p + dist * d;
     tvec::Vec3f d1, norm;
@@ -249,52 +250,162 @@ void Scene::addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float
     }
 }
 
-void Scene::addEnergy(image::SmallImage &img, \
-			const tvec::Vec3f &p, const tvec::Vec3f &d, Float val, \
-			const med::Medium &medium) const {
+//void Scene::addEnergy(image::SmallImage &img,
+//			const tvec::Vec3f &p, const tvec::Vec3f &d, Float distTravelled,
+//			Float val, const med::Medium &medium) const {
+//
+//	tvec::Vec3f q;
+//	Float t;
+//
+//#ifdef USE_WEIGHT_NORMALIZATION
+//	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
+//		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
+//#endif
+//
+//	if (std::abs(m_refX.x) > M_EPSILON) {
+//		t = ((m_refX.x > FPCONST(0.0) ? m_mediumBlock.getBlockR().x : m_mediumBlock.getBlockL().x) - p.x)/m_refX.x;
+//		q = p + t*m_refX;
+//		if (m_mediumBlock.inside(q)) {
+//			addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX));
+//		}
+//	}
+//
+//	if (std::abs(m_refY.y) > M_EPSILON) {
+//		t = ((m_refY.y > FPCONST(0.0) ? m_mediumBlock.getBlockR().y : m_mediumBlock.getBlockL().y) - p.y)/m_refY.y;
+//		q = p + t*m_refY;
+//		if (m_mediumBlock.inside(q)) {
+//			addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refY));
+//		}
+//	}
+//
+//	if (std::abs(m_refZ.z) > M_EPSILON) {
+//		t = ((m_refZ.z > FPCONST(0.0) ? m_mediumBlock.getBlockR().z : m_mediumBlock.getBlockL().z) - p.z)/m_refZ.z;
+//		q = p + t*m_refZ;
+//		if (m_mediumBlock.inside(q)) {
+//			addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refZ));
+//		}
+//	}
+//}
 
-	tvec::Vec3f q;
+void Scene::addEnergy(image::SmallImage &img,
+			const tvec::Vec3f &p, const tvec::Vec3f &d, Float distTravelled,
+			Float val, const med::Medium &medium) const {
+
+	tvec::Vec3f q, refD;
 	Float t;
+	Float val1;
 
 #ifdef USE_WEIGHT_NORMALIZATION
-	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes()) \
+	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
 		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
 #endif
 
 	if (std::abs(m_refX.x) > M_EPSILON) {
 		t = ((m_refX.x > FPCONST(0.0) ? m_mediumBlock.getBlockR().x : m_mediumBlock.getBlockL().x) - p.x)/m_refX.x;
-		q = p + t*m_refX;
+		refD = m_refX;
+		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
-			addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX));
+			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX);
+			addEnergyToImage(img, q, val1);
 		}
 	}
 
 	if (std::abs(m_refY.y) > M_EPSILON) {
 		t = ((m_refY.y > FPCONST(0.0) ? m_mediumBlock.getBlockR().y : m_mediumBlock.getBlockL().y) - p.y)/m_refY.y;
-		q = p + t*m_refY;
+		refD = m_refY;
+		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
-			addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refY));
+			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX);
+			addEnergyToImage(img, q, val1);
 		}
 	}
 
 	if (std::abs(m_refZ.z) > M_EPSILON) {
 		t = ((m_refZ.z > FPCONST(0.0) ? m_mediumBlock.getBlockR().z : m_mediumBlock.getBlockL().z) - p.z)/m_refZ.z;
-		q = p + t*m_refZ;
+		refD = m_refZ;
+		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
-			addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refZ));
+			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX);
+			addEnergyToImage(img, q, val1);
+		}
+	}
+//	Assert((refD == m_refX) || (refD == m_refY) || (refD == m_refZ));
+}
+
+void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
+						image::SmallImage &dAlbedo, image::SmallImage &dGVal,
+						const tvec::Vec3f &p, const tvec::Vec3f &d,
+						Float distTravelled, Float val, Float sumScoreSigmaT,
+						Float sumScoreAlbedo, Float sumScoreGVal,
+						const med::Medium &medium) const {
+
+	tvec::Vec3f q, refD;
+	Float t;
+	Float val1, valDSigmaT, valDAlbedo, valDGVal;
+
+#ifdef USE_WEIGHT_NORMALIZATION
+	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
+		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
+#endif
+
+	if (std::abs(m_refX.x) > M_EPSILON) {
+		t = ((m_refX.x > FPCONST(0.0) ? m_mediumBlock.getBlockR().x : m_mediumBlock.getBlockL().x) - p.x)/m_refX.x;
+		refD = m_refX;
+		q = p + t*refD;
+		if (m_mediumBlock.inside(q)) {
+			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, refD);
+			addEnergyToImage(img, q, val1);
+			valDSigmaT = val1 * (sumScoreSigmaT - t);
+			addEnergyToImage(dSigmaT, q, valDSigmaT);
+			valDAlbedo = val1 * sumScoreAlbedo;
+			addEnergyToImage(dAlbedo, q, valDAlbedo);
+			valDGVal = val1 * (sumScoreGVal + medium.getPhaseFunction()->score(d, refD));
+			addEnergyToImage(dGVal, q, valDGVal);
+		}
+	}
+
+	if (std::abs(m_refY.y) > M_EPSILON) {
+		t = ((m_refY.y > FPCONST(0.0) ? m_mediumBlock.getBlockR().y : m_mediumBlock.getBlockL().y) - p.y)/m_refY.y;
+		refD = m_refY;
+		q = p + t*refD;
+		if (m_mediumBlock.inside(q)) {
+			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, refD);
+			addEnergyToImage(img, q, val1);
+			valDSigmaT = val1 * (sumScoreSigmaT - t);
+			addEnergyToImage(dSigmaT, q, valDSigmaT);
+			valDAlbedo = val1 * sumScoreAlbedo;
+			addEnergyToImage(dAlbedo, q, valDAlbedo);
+			valDGVal = val1 * (sumScoreGVal + medium.getPhaseFunction()->score(d, refD));
+			addEnergyToImage(dGVal, q, valDGVal);
+		}
+	}
+
+	if (std::abs(m_refZ.z) > M_EPSILON) {
+		t = ((m_refZ.z > FPCONST(0.0) ? m_mediumBlock.getBlockR().z : m_mediumBlock.getBlockL().z) - p.z)/m_refZ.z;
+		refD = m_refZ;
+		q = p + t*refD;
+		if (m_mediumBlock.inside(q)) {
+			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, refD);
+			addEnergyToImage(img, q, val1);
+			valDSigmaT = val1 * (sumScoreSigmaT - t);
+			addEnergyToImage(dSigmaT, q, valDSigmaT);
+			valDAlbedo = val1 * sumScoreAlbedo;
+			addEnergyToImage(dAlbedo, q, valDAlbedo);
+			valDGVal = val1 * (sumScoreGVal + medium.getPhaseFunction()->score(d, refD));
+			addEnergyToImage(dGVal, q, valDGVal);
 		}
 	}
 }
 
-void Scene::addEnergyDirect(image::SmallImage &img, \
-			const tvec::Vec3f &p, const tvec::Vec3f &d, Float val, \
+void Scene::addEnergyDirect(image::SmallImage &img,
+			const tvec::Vec3f &p, const tvec::Vec3f &d, Float val,
 			const med::Medium &medium) const {
 
 	tvec::Vec3f q;
 	Float t;
 
 #ifdef USE_WEIGHT_NORMALIZATION
-	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes()) \
+	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
 		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
 #endif
 

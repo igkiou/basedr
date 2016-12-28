@@ -301,12 +301,11 @@ public:
 	/*
 	 * TODO: Inline these methods in implementations.
 	 */
-	bool movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist, smp::Sampler &sampler) const;
-	inline bool movePhoton(tvec::Vec3f &, tvec::Vec3f &, Float , tvec::Vec3fBuffer &, tvec::Vec3fBuffer &) const {
-		return false;
-	}
+	bool movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist,
+					smp::Sampler &sampler) const;
 	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler) const;
-	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler, tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const;
+	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler,
+				tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const;
 	void addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float val) const;
 
 	inline void addPixel(image::SmallImage &img, int x, int y, Float val) const {
@@ -317,7 +316,14 @@ public:
 	}
 
 	void addEnergy(image::SmallImage &img, const tvec::Vec3f &p,
-						const tvec::Vec3f &d, Float val,
+						const tvec::Vec3f &d, Float distTravelled, Float val,
+						const med::Medium &medium) const;
+
+	void addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
+						image::SmallImage &dAlbedo, image::SmallImage &dGVal,
+						const tvec::Vec3f &p, const tvec::Vec3f &d,
+						Float distTravelled, Float val, Float sumScoreSigmaT,
+						Float sumScoreAlbedo, Float sumScoreGVal,
 						const med::Medium &medium) const;
 
 	void addEnergyDirect(image::SmallImage &img, const tvec::Vec3f &p,

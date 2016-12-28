@@ -24,10 +24,11 @@ public:
 	~HenyeyGreenstein() { }
 
 	Float f(const tvec::Vec3f &in, const tvec::Vec3f &out) const;
+	Float f(Float cosTheta) const;
 	Float derivf(const tvec::Vec3f &in, const tvec::Vec3f &out) const;
-	void fderivf(const tvec::Vec3f &in, const tvec::Vec3f &out,
-				Float &f, Float &derivf) const;
-	Float sample(const tvec::Vec3f &in, smp::Sampler &sampler, \
+	Float score(const tvec::Vec3f &in, const tvec::Vec3f &out) const;
+	Float score(Float cosTheta) const;
+	Float sample(const tvec::Vec3f &in, smp::Sampler &sampler,
 						tvec::Vec3f &out)  const;
 
 protected:

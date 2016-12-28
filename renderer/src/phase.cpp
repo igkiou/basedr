@@ -7,8 +7,13 @@
 namespace pfunc {
 
 Float HenyeyGreenstein::f(const tvec::Vec3f &in, const tvec::Vec3f &out) const {
-	return static_cast<Float>(1.0 / (4.0 * M_PI)) * (FPCONST(1.0) - m_g * m_g) /
-		std::pow(1.f + m_g * m_g - FPCONST(2.0) * m_g * tvec::dot(in, out), FPCONST(1.5));
+	Float cosTheta = tvec::dot(in, out);
+	return f(cosTheta);
+}
+
+Float HenyeyGreenstein::f(Float cosTheta) const {
+		return static_cast<Float>(1.0 / (4.0 * M_PI)) * (FPCONST(1.0) - m_g * m_g) /
+		std::pow(1.f + m_g * m_g - FPCONST(2.0) * m_g * cosTheta, FPCONST(1.5));
 }
 
 Float HenyeyGreenstein::derivf(const tvec::Vec3f &in, const tvec::Vec3f &out) const {
@@ -18,16 +23,29 @@ Float HenyeyGreenstein::derivf(const tvec::Vec3f &in, const tvec::Vec3f &out) co
 		std::pow(1.f + m_g * m_g - FPCONST(2.0) * m_g * cosTheta, FPCONST(2.5));
 }
 
-void HenyeyGreenstein::fderivf(const tvec::Vec3f &in, const tvec::Vec3f &out,
-							Float &f, Float &derivf) const {
+Float HenyeyGreenstein::score(const tvec::Vec3f &in, const tvec::Vec3f &out) const {
 	Float cosTheta = tvec::dot(in, out);
-	Float denominator = 1.f + m_g * m_g - FPCONST(2.0) * m_g * cosTheta;
-	f = static_cast<Float>(1.0 / (4.0 * M_PI)) * (FPCONST(1.0) - m_g * m_g) /
-			std::pow(denominator, FPCONST(1.5));
-	derivf = static_cast<Float>(1.0 / (4.0 * M_PI)) *
-			(m_g * m_g * m_g + m_g * m_g * cosTheta - FPCONST(5.0) * m_g + FPCONST(3.0) * cosTheta) /
-			std::pow(denominator, FPCONST(2.5));
+	return score(cosTheta);
 }
+
+Float HenyeyGreenstein::score(Float cosTheta) const {
+	return static_cast<Float>(1.0 / (4.0 * M_PI)) *
+			(m_g * m_g * m_g + m_g * m_g * cosTheta - FPCONST(5.0) * m_g + FPCONST(3.0) * cosTheta) /
+			(1 - m_g * m_g) /
+			(1.f + m_g * m_g - FPCONST(2.0) * m_g * cosTheta);
+}
+
+
+//void HenyeyGreenstein::fderivf(const tvec::Vec3f &in, const tvec::Vec3f &out,
+//							Float &f, Float &derivf) const {
+//	Float cosTheta = tvec::dot(in, out);
+//	Float denominator = 1.f + m_g * m_g - FPCONST(2.0) * m_g * cosTheta;
+//	f = static_cast<Float>(1.0 / (4.0 * M_PI)) * (FPCONST(1.0) - m_g * m_g) /
+//			std::pow(denominator, FPCONST(1.5));
+//	derivf = static_cast<Float>(1.0 / (4.0 * M_PI)) *
+//			(m_g * m_g * m_g + m_g * m_g * cosTheta - FPCONST(5.0) * m_g + FPCONST(3.0) * cosTheta) /
+//			std::pow(denominator, FPCONST(2.5));
+//}
 
 Float HenyeyGreenstein::sample(const tvec::Vec3f &in, smp::Sampler &sampler, tvec::Vec3f &out) const {
 

@@ -80,13 +80,13 @@ public:
 
 	inline void setPixel(const int x, const int y, const float val) {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes);
-		Assert(val >= 0);
+//		Assert(val >= 0);
 		m_pixels[y * m_xRes + x] = val;
 	}
 
 	inline void addEnergy(const int x, const int y, const float val) {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes);
-		Assert(val >= 0);
+//		Assert(val >= 0);
 		m_pixels[y * m_xRes + x] += val;
 	}
 

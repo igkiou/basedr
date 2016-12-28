@@ -1,6 +1,4 @@
-function im = renderDerivImage(sigmaT, sigmaS, func,...
-										sigmaTSingle, sigmaSSingle, funcSingle, theta, ...
-										scene, renderer)
+function [im, dSigmaT, dAlbedo, dGVal] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer)
 %% 
 % All units are in mm.
 
@@ -22,15 +20,16 @@ viewPlane = scene.viewPlane;
 viewReso = scene.viewReso;
 
 % renderer
-hstep = renderer.hstep;
 numPhotons = renderer.numPhotons;
-numPhotonsLF = renderer.numPhotonsLF;
-useContinuous = renderer.useContinuous;
-useHybrid = renderer.useHybrid;
+useDirect = renderer.useDirect;
 
 %%
-im = renderDerivImage_mex(theta, func, sigmaT, sigmaS, theta, funcSingle, sigmaTSingle, sigmaSSingle, ...
+[im, dSigmaT, dAlbedo, dGVal] = renderDerivImage_mex(sigmaT, albedo, gVal, ...
 						iorMedium, mediumDimensions, ...
 						rayOrigin, rayDir, rayRadius, Li, ...
 						viewOrigin, viewDir, viewY, viewPlane, viewReso, ...
-						hstep, numPhotons, numPhotonsLF,	useContinuous, useHybrid)';
+						numPhotons, useDirect);
+im = im';
+dSigmaT = dSigmaT';
+dAlbedo = dAlbedo';
+dGVal = dGVal';

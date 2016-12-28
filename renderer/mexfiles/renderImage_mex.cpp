@@ -1,5 +1,5 @@
 /*
- * renderImage.cpp
+ * renderImage_mex.cpp
  *
  *  Created on: Sep 5, 2012
  *      Author: igkiou
@@ -57,11 +57,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	 * Initialize scene parameters.
 	 */
 	const Float iorMedium = (Float) iorMediumd;
-	const tvec::Vec3f mediumL(- (Float) mediumDimensionsd[0] * FPCONST(0.5), \
-							- (Float) mediumDimensionsd[1] * FPCONST(0.5), \
+	const tvec::Vec3f mediumL(- (Float) mediumDimensionsd[0] * FPCONST(0.5),
+							- (Float) mediumDimensionsd[1] * FPCONST(0.5),
 							- (Float) mediumDimensionsd[2] * FPCONST(0.5));
-	const tvec::Vec3f mediumR((Float) mediumDimensionsd[0] * FPCONST(0.5), \
-							(Float) mediumDimensionsd[1] * FPCONST(0.5), \
+	const tvec::Vec3f mediumR((Float) mediumDimensionsd[0] * FPCONST(0.5),
+							(Float) mediumDimensionsd[1] * FPCONST(0.5),
 							(Float) mediumDimensionsd[2] * FPCONST(0.5));
 
 	/*
