@@ -146,20 +146,13 @@ endif
 
 samples: \
 	$(SAMPLEDIR)/renderer_sample_bin
-#	$(SAMPLEDIR)/test_phase_bin \
-#	$(SAMPLEDIR)/test_img_bin \
-#	$(SAMPLEDIR)/test_fp_bin \
-#	$(SAMPLEDIR)/test_sampler_bin \
-#	$(SAMPLEDIR)/test_vec_bin
 
 mexfiles: \
 	$(MEXDIR)/renderImage_mex.$(MEXEXT) \
 	$(MEXDIR)/renderDerivImage_mex.$(MEXEXT) \
-	$(MEXDIR)/renderDerivImageWeight_mex.$(MEXEXT) 
-#	$(MEXDIR)/renderDerivImage_mex.$(MEXEXT) \
-#	$(MEXDIR)/test_fp_mex.$(MEXEXT) \
-#	$(MEXDIR)/test_source_mex.$(MEXEXT) \
-#	$(MEXDIR)/test_move_photon_mex.$(MEXEXT)
+	$(MEXDIR)/renderDerivImageWeight_mex.$(MEXEXT) \
+	$(MEXDIR)/test_fp_mex.$(MEXEXT) \
+	$(MEXDIR)/test_source_mex.$(MEXEXT)
 
 $(SAMPLEDIR)/%_bin: \
 	$(SAMPLEDIR)/%.o \
