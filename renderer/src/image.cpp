@@ -50,7 +50,7 @@ void SmallImage::writeOpenEXR(const std::string& fileName) const {
 
 namespace {
 
-SmallImage::EByteOrder getHostByteOrder() {
+Image2<float>::EByteOrder getHostByteOrder() {
 	union {
 		std::uint8_t  charValue[2];
 		std::uint16_t shortValue;
@@ -58,13 +58,14 @@ SmallImage::EByteOrder getHostByteOrder() {
 	charValue[0] = 1;
 	charValue[1] = 0;
 
-	return (shortValue == 1)?(SmallImage::EByteOrder::ELittleEndian)
-							:(SmallImage::EByteOrder::EBigEndian);
+	return (shortValue == 1)?(Image2<float>::EByteOrder::ELittleEndian)
+							:(Image2<float>::EByteOrder::EBigEndian);
 }
 
 } /* namespace */
 
-void SmallImage::writePFM(const std::string& fileName) const {//,
+template <>
+void Image2<float>::writePFM(const std::string& fileName) const {//,
 //						const EByteOrder fileEndianness) const {
 
 //	Assert((fileEndianness == EBigEndian) || (fileEndianness == ELittleEndian));
@@ -85,7 +86,7 @@ void SmallImage::writePFM(const std::string& fileName) const {//,
 	AssertEx(file, "Problem writing output file.");
 	file << '\n';
 	AssertEx(file, "Problem writing output file.");
-	file << ((getHostByteOrder() == SmallImage::EByteOrder::ELittleEndian)
+	file << ((getHostByteOrder() == Image2<float>::EByteOrder::ELittleEndian)
 							?(static_cast<float>(-1.0))
 							:(static_cast<float>(1.0)));
 	AssertEx(file, "Problem writing output file.");
@@ -95,42 +96,6 @@ void SmallImage::writePFM(const std::string& fileName) const {//,
 	file.write(reinterpret_cast<char*>(m_pixels),
 			m_xRes * m_yRes * sizeof(float));
 	AssertEx(file, "Problem writing output file.");
-}
-
-void SmallImageSet::mergeImages(SmallImage &mergedImage) const {
-	Assert(mergedImage.getXRes() == m_xRes && mergedImage.getYRes() == m_yRes);
-	for (int i = 0; i < m_yRes; ++i) {
-		for (int j = 0; j < m_xRes; ++j) {
-			float val = 0.0f;
-			for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
-				val += m_images[iterImage].getPixel(j, i);
-			}
-			mergedImage.setPixel(j, i, val);
-		}
-	}
-}
-
-SmallImageSet::~SmallImageSet()  {
-	delete[] m_images;
-}
-
-void SmallImageStackSet::mergeImages(SmallImageStack &mergedImage) const {
-	Assert(mergedImage.getXRes() == m_xRes && mergedImage.getYRes() == m_yRes && mergedImage.getZRes() == m_zRes);
-	for (int h = 0; h < m_zRes; ++h) {
-		for (int i = 0; i < m_yRes; ++i) {
-			for (int j = 0; j < m_xRes; ++j) {
-				float val = 0.0f;
-				for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
-					val += m_images[iterImage].getPixel(j, i, h);
-				}
-				mergedImage.setPixel(j, i, h, val);
-			}
-		}
-	}
-}
-
-SmallImageStackSet::~SmallImageStackSet()  {
-	delete[] m_images;
 }
 
 }	/* namespace image */

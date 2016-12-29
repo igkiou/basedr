@@ -11,8 +11,8 @@
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	/* Check number of input arguments */
-	if (nrhs != 16) {
-		mexErrMsgTxt("Sixteen input arguments are required.");
+	if (nrhs != 17) {
+		mexErrMsgTxt("Seventeen input arguments are required.");
 	}
 
 	/* Check number of output arguments */
@@ -44,7 +44,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	/* Input rendering parameters. */
 	const double numPhotonsd = (double) mxGetScalar(prhs[14]);
-	const double useDirectd = (double) mxGetScalar(prhs[15]);
+	const double maxDepthd = (double) mxGetScalar(prhs[15]);
+	const double useDirectd = (double) mxGetScalar(prhs[16]);
 
 	/*
 	 * Initialize scattering parameters.
@@ -85,8 +86,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	 * Initialize rendering parameters.
 	 */
 	const int64 numPhotons = (int64) numPhotonsd;
+	const int maxDepth = (int) maxDepthd;
 	const bool useDirect = (useDirectd > 0);
-	const int maxDepth = -1;
 
 	const med::Medium medium(sigmaT, albedo, phase);
 	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
@@ -96,8 +97,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	renderer.renderImage(img0, medium, scene, numPhotons);
 
 	/* Be sure to check for x and y here. */
-	plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, mxSINGLE_CLASS, mxREAL); /* x */
-	float *matImg = (float *) mxGetData(plhs[0]);
+#ifdef USE_DOUBLE_PRECISION
+	mxClassID matClassID = mxDOUBLE_CLASS;
+#else
+	mxClassID matClassID = mxSINGLE_CLASS;
+#endif
+	plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	Float *matImg = (Float *) mxGetData(plhs[0]);
 	img0.copyImage(matImg, viewReso.y * viewReso.x);
 	delete phase;
 }

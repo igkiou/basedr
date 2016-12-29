@@ -11,8 +11,8 @@
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	/* Check number of input arguments */
-	if (nrhs != 19) {
-		mexErrMsgTxt("Nineteen input arguments are required.");
+	if (nrhs != 20) {
+		mexErrMsgTxt("Twenty input arguments are required.");
 	}
 
 	/* Check number of output arguments */
@@ -48,7 +48,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	/* Input rendering parameters. */
 	const double numPhotonsd = (double) mxGetScalar(prhs[17]);
-	const double useDirectd = (double) mxGetScalar(prhs[18]);
+	const double maxDepthd = (double) mxGetScalar(prhs[18]);
+	const double useDirectd = (double) mxGetScalar(prhs[19]);
 
 	/*
 	 * Initialize scattering parameters.
@@ -95,8 +96,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	 * Initialize rendering parameters.
 	 */
 	const int64 numPhotons = (int64) numPhotonsd;
+	const int maxDepth = (int) maxDepthd;
 	const bool useDirect = (useDirectd > 0);
-	const int maxDepth = -1;
 
 	const med::Medium medium(sigmaT, albedo, phase);
 	const med::Medium samplingMedium(samplingSigmaT, samplingAlbedo, samplingPhase);
@@ -110,17 +111,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	renderer.renderDerivImageWeight(img0, dSigmaT0, dAlbedo0, dGVal0, medium, samplingMedium, scene, numPhotons);
 
 	/* Be sure to check for x and y here. */
-	plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, mxSINGLE_CLASS, mxREAL); /* x */
-	float *matImg = (float *) mxGetData(plhs[0]);
+#ifdef USE_DOUBLE_PRECISION
+	mxClassID matClassID = mxDOUBLE_CLASS;
+#else
+	mxClassID matClassID = mxSINGLE_CLASS;
+#endif
+	plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	Float *matImg = (Float *) mxGetData(plhs[0]);
 	img0.copyImage(matImg, viewReso.y * viewReso.x);
-	plhs[1] = mxCreateNumericMatrix(viewReso.y, viewReso.x, mxSINGLE_CLASS, mxREAL); /* x */
-	float *matDSigmaT = (float *) mxGetData(plhs[1]);
+	plhs[1] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	Float *matDSigmaT = (Float *) mxGetData(plhs[1]);
 	dSigmaT0.copyImage(matDSigmaT, viewReso.y * viewReso.x);
-	plhs[2] = mxCreateNumericMatrix(viewReso.y, viewReso.x, mxSINGLE_CLASS, mxREAL); /* x */
-	float *matDAlbedo = (float *) mxGetData(plhs[2]);
+	plhs[2] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	Float *matDAlbedo = (Float *) mxGetData(plhs[2]);
 	dAlbedo0.copyImage(matDAlbedo, viewReso.y * viewReso.x);
-	plhs[3] = mxCreateNumericMatrix(viewReso.y, viewReso.x, mxSINGLE_CLASS, mxREAL); /* x */
-	float *matDGVal = (float *) mxGetData(plhs[3]);
+	plhs[3] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	Float *matDGVal = (Float *) mxGetData(plhs[3]);
 	dGVal0.copyImage(matDGVal, viewReso.y * viewReso.x);
 	delete phase;
 }

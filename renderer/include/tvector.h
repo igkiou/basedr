@@ -403,14 +403,6 @@ typedef TVector3<Float> Vec3f;
 typedef TVector3<double> Vec3d;
 //typedef TVector3<Float> Vec3F;
 
-#ifdef USE_DEQUE_BUFFER
-typedef std::deque<Vec3f> Vec3fBuffer;
-typedef std::deque<Vec3f> Vec3fStorage;
-#else
-typedef std::vector<Vec3f> Vec3fBuffer;
-typedef std::vector<Vec3f> Vec3fStorage;
-#endif
-
 }	/* namespace tvec */
 
 #endif /* TVECTOR_H_ */

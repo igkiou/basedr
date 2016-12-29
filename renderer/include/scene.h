@@ -102,7 +102,7 @@ struct Camera {
 //		m_viewX = tvec::cross(m_viewDir, m_viewY);
 		m_viewX = tvec::cross(m_viewY, m_viewDir);
 
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 		std::cout << "viewDir " << m_viewDir.x << " " << m_viewDir.y << " " << m_viewDir.z << std::endl;
 		std::cout << "viewY " << m_viewY.x << " " << m_viewY.y << " " << m_viewY.z << std::endl;
 		std::cout << "viewX " << m_viewX.x << " " << m_viewX.y << " " << m_viewX.z << std::endl;
@@ -188,7 +188,7 @@ struct RaySource {
 		m_coord1.normalize();
 		m_coord2 = tvec::cross(m_dir, m_coord1);
 		m_coord2.normalize();
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 		std::cout << " dir " << m_dir.x << " " << m_dir.y << " " << m_dir.z << std::endl;
 		std::cout << " c1 " << m_coord1.x << " " << m_coord1.y << " " << m_coord1.z << std::endl;
 		std::cout << " c2 " << m_coord2.x << " " << m_coord2.y << " " << m_coord2.z << std::endl;
@@ -277,7 +277,7 @@ public:
 				m_refZ.z *= -FPCONST(1.0);
 			}
 		}
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 		std::cout << "refX " << m_refX.x << " " << m_refX.y << " " << m_refX.z << std::endl;
 		std::cout << "refY " << m_refY.x << " " << m_refY.y << " " << m_refY.z << std::endl;
 		std::cout << "refZ " << m_refZ.x << " " << m_refZ.y << " " << m_refZ.z << std::endl;
@@ -292,7 +292,7 @@ public:
 #ifndef USE_NO_FRESNEL
 		m_fresnelTrans = FPCONST(1.0) - util::fresnelDielectric(m_source.getDir().x, m_refrDir.x, m_mediumIor);
 #endif
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 		std::cout << "refrDir " << m_refrDir.x << " " << m_refrDir.y << " " << m_refrDir.z << std::endl;
 		std::cout << "fresnel " << m_fresnelTrans << std::endl;
 #endif
@@ -311,7 +311,7 @@ public:
 	inline void addPixel(image::SmallImage &img, int x, int y, Float val) const {
 
 		if (x >= 0 && x < img.getXRes() && y >= 0 && y < img.getYRes()) {
-			img.addEnergy(x, y, static_cast<float>(val));
+			img.addEnergy(x, y, static_cast<Float>(val));
 		}
 	}
 

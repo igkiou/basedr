@@ -298,6 +298,9 @@ void Scene::addEnergy(image::SmallImage &img,
 #ifdef USE_WEIGHT_NORMALIZATION
 	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
 		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
+#ifdef USE_PRINTING
+		std::cout << "using weight normalization " << std::endl;
+#endif
 #endif
 
 	if (std::abs(m_refX.x) > M_EPSILON) {
@@ -346,10 +349,19 @@ void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
 #ifdef USE_WEIGHT_NORMALIZATION
 	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
 		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
+#ifdef USE_PRINTING
+		std::cout << "using weight normalization " << std::endl;
+#endif
+#endif
+#ifdef USE_PRINTING
+	std::cout << "total = " << distTravelled << std::endl;
 #endif
 
 	if (std::abs(m_refX.x) > M_EPSILON) {
 		t = ((m_refX.x > FPCONST(0.0) ? m_mediumBlock.getBlockR().x : m_mediumBlock.getBlockL().x) - p.x)/m_refX.x;
+#ifdef USE_PRINTING
+		std::cout << "connection = " << t << std::endl;
+#endif
 		refD = m_refX;
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
@@ -366,6 +378,9 @@ void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
 
 	if (std::abs(m_refY.y) > M_EPSILON) {
 		t = ((m_refY.y > FPCONST(0.0) ? m_mediumBlock.getBlockR().y : m_mediumBlock.getBlockL().y) - p.y)/m_refY.y;
+#ifdef USE_PRINTING
+		std::cout << "connection = " << t << std::endl;
+#endif
 		refD = m_refY;
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
@@ -382,6 +397,9 @@ void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
 
 	if (std::abs(m_refZ.z) > M_EPSILON) {
 		t = ((m_refZ.z > FPCONST(0.0) ? m_mediumBlock.getBlockR().z : m_mediumBlock.getBlockL().z) - p.z)/m_refZ.z;
+#ifdef USE_PRINTING
+		std::cout << "connection = " << t << std::endl;
+#endif
 		refD = m_refZ;
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
@@ -407,6 +425,9 @@ void Scene::addEnergyDirect(image::SmallImage &img,
 #ifdef USE_WEIGHT_NORMALIZATION
 	val *=	static_cast<Float>(img.getXRes()) * static_cast<Float>(img.getYRes())
 		/ (m_camera.getViewPlane().x * m_camera.getViewPlane().y);
+#ifdef USE_PRINTING
+		std::cout << "using weight normalization " << std::endl;
+#endif
 #endif
 
 	if (std::abs(m_refX.x) > M_EPSILON) {

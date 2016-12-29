@@ -21,6 +21,7 @@ viewReso = scene.viewReso;
 
 % renderer
 numPhotons = renderer.numPhotons;
+maxDepth = renderer.maxDepth;
 useDirect = renderer.useDirect;
 
 %%
@@ -28,7 +29,7 @@ useDirect = renderer.useDirect;
 						iorMedium, mediumDimensions, ...
 						rayOrigin, rayDir, rayRadius, Li, ...
 						viewOrigin, viewDir, viewY, viewPlane, viewReso, ...
-						numPhotons, useDirect);
+						numPhotons, maxDepth, useDirect);
 im = im';
 dSigmaT = dSigmaT';
 dAlbedo = dAlbedo';

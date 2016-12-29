@@ -32,7 +32,8 @@ namespace image {
  * parallelism.
  * NOTE: Add version for reference return, or unary operators to single pixels.
  */
-class SmallImage {
+template <typename T>
+class Image2 {
 public:
 	enum EFileFormat {
 		EOpenEXR = 0,
@@ -48,17 +49,18 @@ public:
 		EByteOrderInvalid = -1
 	};
 
-	SmallImage()
-			: m_xRes(0),
-			  m_yRes(0),
-			  m_pixels(NULL) {	}
+	Image2() :
+			m_xRes(0),
+			m_yRes(0),
+			m_pixels(NULL) {	}
 
-	SmallImage(const int xRes, const int yRes)
-			: m_xRes(xRes),
-			  m_yRes(yRes) {
-		Assert(xRes > 0 && yRes > 0);
-		m_pixels = (float *) memalign(L1_CACHE_LINE_SIZE,
-									m_xRes * m_yRes * sizeof(float));
+	Image2(const int xRes, const int yRes) :
+			m_xRes(xRes),
+			m_yRes(yRes),
+			m_pixels(NULL) {
+			Assert(xRes > 0 && yRes > 0);
+		m_pixels = (T *) memalign(L1_CACHE_LINE_SIZE,
+									m_xRes * m_yRes * sizeof(T));
 	}
 
 	void setSize(const int xRes, const int yRes) {
@@ -66,31 +68,31 @@ public:
 		Assert(xRes > 0 && yRes > 0);
 		m_xRes = xRes;
 		m_yRes = yRes;
-		m_pixels = (float *) malloc(m_xRes * m_yRes * sizeof(float));
+		m_pixels = (T *) malloc(m_xRes * m_yRes * sizeof(T));
 	}
 
 	inline void zero() {
-		memset((void *) m_pixels, 0, m_xRes * m_yRes * sizeof(float));
+		memset((void *) m_pixels, 0, m_xRes * m_yRes * sizeof(T));
 	}
 
-	inline float getPixel(const int x, const int y) const {
+	inline T getPixel(const int x, const int y) const {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes);
 		return m_pixels[y * m_xRes + x];
 	}
 
-	inline void setPixel(const int x, const int y, const float val) {
+	inline void setPixel(const int x, const int y, const T val) {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes);
 //		Assert(val >= 0);
 		m_pixels[y * m_xRes + x] = val;
 	}
 
-	inline void addEnergy(const int x, const int y, const float val) {
+	inline void addEnergy(const int x, const int y, const T val) {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes);
 //		Assert(val >= 0);
 		m_pixels[y * m_xRes + x] += val;
 	}
 
-//	inline const float* getImage() const {
+//	inline const T* getImage() const {
 //		return m_pixels;
 //	}
 
@@ -103,13 +105,13 @@ public:
 	}
 
 #ifdef NDEBUG
-	inline void copyImage(float *buffer, const int) const {
+	inline void copyImage(T *buffer, const int) const {
 #else
-	inline void copyImage(float *buffer, const int size) const {
+	inline void copyImage(T *buffer, const int size) const {
 #endif
 		Assert(size == m_xRes * m_yRes);
 		memcpy((void *) buffer, (void *) m_pixels,
-			m_xRes * m_yRes * sizeof(float));
+			m_xRes * m_yRes * sizeof(T));
 	}
 
 	inline void writeToFile(const std::string& fileName,
@@ -133,7 +135,7 @@ public:
 		}
 	}
 
-	~SmallImage() {
+	~Image2() {
 		free(m_pixels);
 	}
 
@@ -149,25 +151,27 @@ private:
 
 	int m_xRes;
 	int m_yRes;
-	float *m_pixels;
+	T *m_pixels;
 };
 
-class SmallImageStack {
+template <typename T>
+class Image3 {
 public:
 
-	SmallImageStack()
-			: m_xRes(0),
-			  m_yRes(0),
-			  m_zRes(0),
-			  m_pixels(NULL) {	}
+	Image3() :
+			m_xRes(0),
+			m_yRes(0),
+			m_zRes(0),
+			m_pixels(NULL) {	}
 
-	SmallImageStack(const int xRes, const int yRes, const int zRes)
-			: m_xRes(xRes),
-			  m_yRes(yRes),
-			  m_zRes(zRes) {
+	Image3(const int xRes, const int yRes, const int zRes) :
+			m_xRes(xRes),
+			m_yRes(yRes),
+			m_zRes(zRes),
+			m_pixels(NULL) {
 		Assert(xRes > 0 && yRes > 0 && zRes > 0);
-		m_pixels = (float *) memalign(L1_CACHE_LINE_SIZE,
-									m_xRes * m_yRes * m_zRes * sizeof(float));
+		m_pixels = (T *) memalign(L1_CACHE_LINE_SIZE,
+									m_xRes * m_yRes * m_zRes * sizeof(T));
 	}
 
 	void setSize(const int xRes, const int yRes, const int zRes) {
@@ -176,33 +180,29 @@ public:
 		m_xRes = xRes;
 		m_yRes = yRes;
 		m_zRes = zRes;
-		m_pixels = (float *) malloc(m_xRes * m_yRes * m_zRes * sizeof(float));
+		m_pixels = (T *) malloc(m_xRes * m_yRes * m_zRes * sizeof(T));
 	}
 
 	inline void zero() {
-		memset((void *) m_pixels, 0, m_xRes * m_yRes * m_zRes * sizeof(float));
+		memset((void *) m_pixels, 0, m_xRes * m_yRes * m_zRes * sizeof(T));
 	}
 
-	inline float getPixel(const int x, const int y, const int z) const {
+	inline T getPixel(const int x, const int y, const int z) const {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes && z >= 0 && z < m_zRes);
 		return m_pixels[z * m_xRes * m_yRes + y * m_yRes + x];
 	}
 
-	inline void setPixel(const int x, const int y, const int z, const float val) {
+	inline void setPixel(const int x, const int y, const int z, const T val) {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes && z >= 0 && z < m_zRes);
-		Assert(val >= 0);
+//		Assert(val >= 0);
 		m_pixels[z * m_xRes * m_yRes + y * m_yRes + x] = val;
 	}
 
-	inline void addEnergy(const int x, const int y, const int z, const float val) {
+	inline void addEnergy(const int x, const int y, const int z, const T val) {
 		Assert(x >= 0 && x < m_xRes && y >= 0 && y < m_yRes && z >= 0 && z < m_zRes);
-		Assert(val >= 0);
+//		Assert(val >= 0);
 		m_pixels[z * m_xRes * m_yRes + y * m_yRes + x] += val;
 	}
-
-//	inline const float* getImage() const {
-//		return m_pixels;
-//	}
 
 	inline int getXRes() const {
 		return m_xRes;
@@ -217,16 +217,16 @@ public:
 	}
 
 #ifdef NDEBUG
-	inline void copyImage(float *buffer, const int) const {
+	inline void copyImage(T *buffer, const int) const {
 #else
-	inline void copyImage(float *buffer, const int size) const {
+	inline void copyImage(T *buffer, const int size) const {
 #endif
 		Assert(size == m_xRes * m_yRes * m_zRes);
 		memcpy((void *) buffer, (void *) m_pixels,
-			m_xRes * m_yRes * m_zRes * sizeof(float));
+			m_xRes * m_yRes * m_zRes * sizeof(T));
 	}
 
-	~SmallImageStack() {
+	~Image3() {
 		free(m_pixels);
 	}
 
@@ -235,23 +235,24 @@ private:
 	int m_xRes;
 	int m_yRes;
 	int m_zRes;
-	float *m_pixels;
+	T *m_pixels;
 };
 
-class SmallImageSet {
+template <typename T>
+class Image2Set {
 public:
-	explicit SmallImageSet(const int numImages)
+	explicit Image2Set(const int numImages)
 				: m_xRes(0),
 				  m_yRes(0),
 				  m_numImages(numImages) {
-		m_images = new SmallImage[m_numImages];
+		m_images = new Image2<T>[m_numImages];
 	}
 
-	SmallImageSet(const int xRes, const int yRes, const int numImages)
+	Image2Set(const int xRes, const int yRes, const int numImages)
 				: m_xRes(xRes),
 				  m_yRes(yRes),
 				  m_numImages(numImages) {
-		m_images = new SmallImage[m_numImages];
+		m_images = new Image2<T>[m_numImages];
 		for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
 			m_images[iterImage].setSize(m_xRes, m_yRes);
 		}
@@ -272,41 +273,56 @@ public:
 		}
 	}
 
-	inline SmallImage &operator[](int i) {
+	inline Image2<T> &operator[](int i) {
 		return m_images[i];
 	}
 
-	inline const SmallImage &operator[](int i) const {
+	inline const Image2<T> &operator[](int i) const {
 		return m_images[i];
 	}
 
-	void mergeImages(SmallImage &mergedImage) const;
+	inline void mergeImages(Image2<T> &mergedImage) const {
+		Assert(mergedImage.getXRes() == m_xRes && mergedImage.getYRes() == m_yRes);
+		for (int i = 0; i < m_yRes; ++i) {
+			for (int j = 0; j < m_xRes; ++j) {
+				T val = 0.0;
+				for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
+					val += m_images[iterImage].getPixel(j, i);
+				}
+				mergedImage.setPixel(j, i, val);
+			}
+		}
+	}
 
-	~SmallImageSet();
+	~Image2Set() {
+		delete[] m_images;
+	}
 
 private:
 	int m_xRes;
 	int m_yRes;
 	int m_numImages;
-	SmallImage *m_images;
+	Image2<T> *m_images;
 };
 
-class SmallImageStackSet {
+
+template <typename T>
+class Image3Set {
 public:
-	explicit SmallImageStackSet(const int numImages)
-				: m_xRes(0),
-				  m_yRes(0),
-				  m_zRes(0),
-				  m_numImages(numImages) {
-		m_images = new SmallImageStack[m_numImages];
+	explicit Image3Set(const int numImages) :
+			m_xRes(0),
+			m_yRes(0),
+			m_zRes(0),
+			m_numImages(numImages) {
+		m_images = new Image3<T>[m_numImages];
 	}
 
-	SmallImageStackSet(const int xRes, const int yRes, const int zRes, const int numImages)
-				: m_xRes(xRes),
-				  m_yRes(yRes),
-				  m_zRes(zRes),
-				  m_numImages(numImages) {
-		m_images = new SmallImageStack[m_numImages];
+	Image3Set(const int xRes, const int yRes, const int zRes, const int numImages) :
+			m_xRes(xRes),
+			m_yRes(yRes),
+			m_zRes(zRes),
+			m_numImages(numImages) {
+		m_images = new Image3<T>[m_numImages];
 		for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
 			m_images[iterImage].setSize(m_xRes, m_yRes, m_zRes);
 		}
@@ -328,25 +344,45 @@ public:
 		}
 	}
 
-	inline SmallImageStack &operator[](int i) {
+	inline Image3<T> &operator[](int i) {
 		return m_images[i];
 	}
 
-	inline const SmallImageStack &operator[](int i) const {
+	inline const Image3<T> &operator[](int i) const {
 		return m_images[i];
 	}
 
-	void mergeImages(SmallImageStack &mergedImage) const;
+	void mergeImages(Image3<T> &mergedImage) const {
+		Assert(mergedImage.getXRes() == m_xRes && mergedImage.getYRes() == m_yRes && mergedImage.getZRes() == m_zRes);
+		for (int h = 0; h < m_zRes; ++h) {
+			for (int i = 0; i < m_yRes; ++i) {
+				for (int j = 0; j < m_xRes; ++j) {
+					T val = 0.0;
+					for (int iterImage = 0; iterImage < m_numImages; ++iterImage) {
+						val += m_images[iterImage].getPixel(j, i, h);
+					}
+					mergedImage.setPixel(j, i, h, val);
+				}
+			}
+		}
+	}
 
-	~SmallImageStackSet();
+	~Image3Set() {
+		delete[] m_images;
+	}
 
 private:
 	int m_xRes;
 	int m_yRes;
 	int m_zRes;
 	int m_numImages;
-	SmallImageStack *m_images;
+	Image3<T> *m_images;
 };
+
+typedef Image2<Float> SmallImage;
+typedef Image2Set<Float> SmallImageSet;
+typedef Image3<Float> TransientImage;
+typedef Image3Set<Float> TransientImageSet;
 
 } /* namespace image */
 

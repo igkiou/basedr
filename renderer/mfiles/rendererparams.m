@@ -1,5 +1,6 @@
 function params = rendererparams(varargin)
 %% 
+params.maxDepth = -1;
 params.useDirect = 0;			% always keep 0, except for geometric.
 params.numPhotons = 500000;
 	

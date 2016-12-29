@@ -27,7 +27,12 @@ class Renderer {
 public:
 	Renderer(const Float maxDepth, const bool useDirect)
 			: m_maxDepth(maxDepth),
-			  m_useDirect(useDirect) {	}
+			  m_useDirect(useDirect) {
+#ifndef NDEBUG
+	std::cout << "maxDepth " << m_maxDepth << std::endl;
+	std::cout << "useDirect " << m_useDirect << std::endl;
+#endif
+	}
 
 	bool scatterOnce(tvec::Vec3f &p, tvec::Vec3f &d, Float &dist, Float &cosTheta,
 					const scn::Scene &scene, const med::Medium &medium,

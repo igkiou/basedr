@@ -4,20 +4,20 @@
 %% scattering medium
 
 % simulated medium
-% gVal = 0.3;
 % sigmaT = 10;
 % albedo = 0.9;
-gVal = 0.8;
+% gVal = 0.3;
 sigmaT = 1;
-albedo = 0.99;
+albedo = 0.9;
+gVal = 0.8;
 
 % sampling medium (used for path sampling)
-% samplingGVal = gVal;
 % samplingSigmaT = sigmaT;
 % samplingAlbedo = albedo;
-samplingGVal = 0.5;
-samplingSigmaT = 0.5;
+% samplingGVal = gVal;
+samplingSigmaT = 10;
 samplingAlbedo = 0.95;
+samplingGVal = 0.5;
 
 %% basic scene info
 iorMedium = 1;
@@ -42,7 +42,8 @@ viewAngle = deg2rad(0);
 viewOrigin = [0.0; 0.0];
 
 %% renderer options
-numPhotons = 1000000000;
+numPhotons = 1;
+maxDepth = -1;
 % numPhotons = 100000000;
 
 %% image params
@@ -69,7 +70,7 @@ scene = sceneparams('iorMedium', iorMedium, 'mediumDimensions', mediumDimensions
 
 %% create renderer params
 useDirect = 0;			% always keep 0, except for geometric.
-renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons);
+renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons, 'maxDepth', maxDepth);
 
 %% do rendering
 % im and im_alt should be numerically identical;
@@ -79,10 +80,10 @@ renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons);
 %		simulated and sampling mediums are the same;
 
 % render an image by importance sampling the simulated medium
-im = renderImage(sigmaT, albedo, gVal, scene, renderer);
+% im = renderImage(sigmaT, albedo, gVal, scene, renderer);
 
 % render an image and derivatives by importance sampling the simulated medium
-[im_alt, dSigmaT, dAlbedo, dGVal] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer);
+% [im_alt, dSigmaT, dAlbedo, dGVal] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer);
 
 % render an image and derivatives by importance sampling the alternative sampling medium
 [im_altw, dSigmaTw, dAlbedow, dGValw] = renderDerivImageWeight(sigmaT, albedo, gVal,...

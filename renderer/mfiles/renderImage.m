@@ -21,6 +21,7 @@ viewReso = scene.viewReso;
 
 % renderer
 numPhotons = renderer.numPhotons;
+maxDepth = renderer.maxDepth;
 useDirect = renderer.useDirect;
 
 %%
@@ -28,4 +29,4 @@ im = renderImage_mex(sigmaT, albedo, gVal, ...
 						iorMedium, mediumDimensions, ...
 						rayOrigin, rayDir, rayRadius, Li, ...
 						viewOrigin, viewDir, viewY, viewPlane, viewReso, ...
-						numPhotons, useDirect)';
+						numPhotons, maxDepth, useDirect)';

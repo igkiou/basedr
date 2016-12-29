@@ -47,7 +47,7 @@ void Renderer::scatter(const tvec::Vec3f &p, const tvec::Vec3f &d,
 		}
 		++depth;
 		totalDist += dist;
-		while (m_maxDepth < 0 || depth < m_maxDepth) {
+		while (m_maxDepth < 0 || depth <= m_maxDepth) {
 			scene.addEnergy(img, pos, dir, totalDist, weight, medium);
 
 			if (!scatterOnce(pos, dir, dist, cosTheta, scene, medium, sampler)) {
@@ -82,7 +82,7 @@ void Renderer::scatterDeriv(const tvec::Vec3f &p, const tvec::Vec3f &d,
 		Float sumScoreSigmaT = (FPCONST(1.0) - medium.getSigmaT() * dist);
 		Float sumScoreAlbedo = FPCONST(1.0) / medium.getAlbedo();
 		Float sumScoreGVal = FPCONST(0.0);
-		while (m_maxDepth < 0 || depth < m_maxDepth) {
+		while (m_maxDepth < 0 || depth <= m_maxDepth) {
 
 			scene.addEnergyDeriv(img, dSigmaT, dAlbedo, dGVal, pos, dir,
 							totalDist, weight, sumScoreSigmaT, sumScoreAlbedo,
@@ -140,6 +140,9 @@ void Renderer::scatterDerivWeight(const tvec::Vec3f &p, const tvec::Vec3f &d,
 
 		Float cosTheta = FPCONST(0.0);
 		Float dist = getMoveStep(samplingMedium, sampler);
+#ifdef USE_PRINTING
+		std::cout << "sampled first = " << dist << std::endl;
+#endif
 		if (!scene.movePhoton(pos, dir, dist, sampler)) {
 			return;
 		}
@@ -152,16 +155,24 @@ void Renderer::scatterDerivWeight(const tvec::Vec3f &p, const tvec::Vec3f &d,
 		Float sumScoreSigmaT = (FPCONST(1.0) - medium.getSigmaT() * dist);
 		Float sumScoreAlbedo = FPCONST(1.0) / medium.getAlbedo();
 		Float sumScoreGVal = FPCONST(0.0);
-		while (m_maxDepth < 0 || depth < m_maxDepth) {
+		while (m_maxDepth < 0 || depth <= m_maxDepth) {
 
+#ifdef USE_PRINTING
+		std::cout << "total to add = " << totalDist << std::endl;
+#endif
+//			if (depth == 2) {
 			scene.addEnergyDeriv(img, dSigmaT, dAlbedo, dGVal, pos, dir,
 							totalDist, weight, sumScoreSigmaT, sumScoreAlbedo,
 							sumScoreGVal, medium);
+//			}
 
 			if (!scatterOnceWeight(pos, dir, weight, dist, cosTheta, scene,
 								medium, samplingMedium, sampler)) {
 				break;
 			}
+#ifdef USE_PRINTING
+			std::cout << "sampled = " << dist << std::endl;
+#endif
 			totalDist += dist;
 			++depth;
 			sumScoreAlbedo += FPCONST(1.0) / medium.getAlbedo();
@@ -181,11 +192,12 @@ void Renderer::renderImage(image::SmallImage &img0,
 #ifdef USE_THREADED
 	int numThreads = omp_get_num_procs();
 	omp_set_num_threads(numThreads);
-#ifndef NDEBUG
-	std::cout << "numthreads = " << numThreads << std::endl;
-#endif
 #else
 	int numThreads = 1;
+#endif
+#ifndef NDEBUG
+	std::cout << "numthreads = " << numThreads << std::endl;
+	std::cout << "numphotons = " << numPhotons << std::endl;
 #endif
 
 	smp::SamplerSet sampler(numThreads);
@@ -195,7 +207,7 @@ void Renderer::renderImage(image::SmallImage &img0,
 
 	Float weight = getWeight(medium, scene, numPhotons);
 	Float Li = scene.getRaySource().getLi();
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 	std::cout << "weight " << weight << " Li " << Li << std::endl;
 #endif
 
@@ -233,11 +245,12 @@ void Renderer::renderDerivImage(image::SmallImage &img0, image::SmallImage &dSig
 #ifdef USE_THREADED
 	int numThreads = omp_get_num_procs();
 	omp_set_num_threads(numThreads);
-#ifndef NDEBUG
-	std::cout << "numthreads = " << numThreads << std::endl;
-#endif
 #else
 	int numThreads = 1;
+#endif
+#ifndef NDEBUG
+	std::cout << "numthreads = " << numThreads << std::endl;
+	std::cout << "numphotons = " << numPhotons << std::endl;
 #endif
 
 	smp::SamplerSet sampler(numThreads);
@@ -256,7 +269,7 @@ void Renderer::renderDerivImage(image::SmallImage &img0, image::SmallImage &dSig
 
 	Float weight = getWeight(medium, scene, numPhotons);
 	Float Li = scene.getRaySource().getLi();
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 	std::cout << "weight " << weight << " Li " << Li << std::endl;
 #endif
 
@@ -298,11 +311,12 @@ void Renderer::renderDerivImageWeight(image::SmallImage &img0, image::SmallImage
 #ifdef USE_THREADED
 	int numThreads = omp_get_num_procs();
 	omp_set_num_threads(numThreads);
-#ifndef NDEBUG
-	std::cout << "numthreads = " << numThreads << std::endl;
-#endif
 #else
 	int numThreads = 1;
+#endif
+#ifndef NDEBUG
+	std::cout << "numthreads = " << numThreads << std::endl;
+	std::cout << "numphotons = " << numPhotons << std::endl;
 #endif
 
 	smp::SamplerSet sampler(numThreads);
@@ -321,7 +335,7 @@ void Renderer::renderDerivImageWeight(image::SmallImage &img0, image::SmallImage
 
 	Float weight = getWeight(medium, scene, numPhotons);
 	Float Li = scene.getRaySource().getLi();
-#ifndef NDEBUG
+#ifdef USE_PRINTING
 	std::cout << "weight " << weight << " Li " << Li << std::endl;
 #endif
 
