@@ -11,8 +11,8 @@
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	/* Check number of input arguments */
-	if (nrhs != 20) {
-		mexErrMsgTxt("Twenty input arguments are required.");
+	if (nrhs != 22) {
+		mexErrMsgTxt("Twenty-two input arguments are required.");
 	}
 
 	/* Check number of output arguments */
@@ -44,12 +44,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	const double *viewDird = (double *) mxGetPr(prhs[13]);
 	const double *viewYd = (double *) mxGetPr(prhs[14]);
 	const double *viewPlaned = (double *) mxGetPr(prhs[15]);
-	const double *viewResod = (double *) mxGetPr(prhs[16]);
+	const double *pathlengthRanged = (double *) mxGetPr(prhs[16]);
+	const double *viewResod = (double *) mxGetPr(prhs[17]);
 
 	/* Input rendering parameters. */
-	const double numPhotonsd = (double) mxGetScalar(prhs[17]);
-	const double maxDepthd = (double) mxGetScalar(prhs[18]);
-	const double useDirectd = (double) mxGetScalar(prhs[19]);
+	const double numPhotonsd = (double) mxGetScalar(prhs[18]);
+	const double maxDepthd = (double) mxGetScalar(prhs[19]);
+	const double maxPathlengthd = (double) mxGetScalar(prhs[20]);
+	const double useDirectd = (double) mxGetScalar(prhs[21]);
 
 	/*
 	 * Initialize scattering parameters.
@@ -90,24 +92,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	const tvec::Vec3f viewDir((Float) viewDird[0], (Float) viewDird[1], (Float) viewDird[2]);
 	const tvec::Vec3f viewY((Float) viewYd[0], (Float) viewYd[1], (Float) viewYd[2]);
 	const tvec::Vec2f viewPlane((Float) viewPlaned[0], (Float) viewPlaned[1]);
-	const tvec::Vec2i viewReso((int) viewResod[0], (int) viewResod[1]);
+	const tvec::Vec2f pathlengthRange((Float) pathlengthRanged[0], (Float) pathlengthRanged[1]);
+	const tvec::Vec3i viewReso((int) viewResod[0], (int) viewResod[1], (int) viewResod[2]);
 
 	/*
 	 * Initialize rendering parameters.
 	 */
 	const int64 numPhotons = (int64) numPhotonsd;
 	const int maxDepth = (int) maxDepthd;
+	const Float maxPathlength = (Float) maxPathlengthd;
 	const bool useDirect = (useDirectd > 0);
 
 	const med::Medium medium(sigmaT, albedo, phase);
 	const med::Medium samplingMedium(samplingSigmaT, samplingAlbedo, samplingPhase);
-	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
-	image::SmallImage img0(viewReso.x, viewReso.y);
-	image::SmallImage dSigmaT0(viewReso.x, viewReso.y);
-	image::SmallImage dAlbedo0(viewReso.x, viewReso.y);
-	image::SmallImage dGVal0(viewReso.x, viewReso.y);
+	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius,
+						Li, viewOrigin, viewDir, viewY, viewPlane, pathlengthRange);
+	image::SmallImage img0(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dSigmaT0(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dAlbedo0(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dGVal0(viewReso.x, viewReso.y, viewReso.z);
 
-	photon::Renderer renderer(maxDepth, useDirect);
+	photon::Renderer renderer(maxDepth, maxPathlength, useDirect);
 	renderer.renderDerivImageWeight(img0, dSigmaT0, dAlbedo0, dGVal0, medium, samplingMedium, scene, numPhotons);
 
 	/* Be sure to check for x and y here. */

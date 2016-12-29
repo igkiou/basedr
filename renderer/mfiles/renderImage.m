@@ -17,16 +17,18 @@ viewOrigin = scene.viewOrigin;
 viewDir = scene.viewDir;
 viewY = scene.viewY;
 viewPlane = scene.viewPlane;
+pathlengthRange = scene.pathlengthRange;
 viewReso = scene.viewReso;
 
 % renderer
 numPhotons = renderer.numPhotons;
 maxDepth = renderer.maxDepth;
+maxPathlength = renderer.maxPathlength;
 useDirect = renderer.useDirect;
 
 %%
 im = renderImage_mex(sigmaT, albedo, gVal, ...
 						iorMedium, mediumDimensions, ...
 						rayOrigin, rayDir, rayRadius, Li, ...
-						viewOrigin, viewDir, viewY, viewPlane, viewReso, ...
-						numPhotons, maxDepth, useDirect)';
+						viewOrigin, viewDir, viewY, viewPlane, pathlengthRange, viewReso, ...
+						numPhotons, maxDepth, maxPathlength, useDirect)';

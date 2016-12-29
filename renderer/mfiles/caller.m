@@ -12,12 +12,12 @@ albedo = 0.9;
 gVal = 0.8;
 
 % sampling medium (used for path sampling)
-% samplingSigmaT = sigmaT;
-% samplingAlbedo = albedo;
-% samplingGVal = gVal;
-samplingSigmaT = 10;
-samplingAlbedo = 0.95;
-samplingGVal = 0.5;
+samplingSigmaT = sigmaT;
+samplingAlbedo = albedo;
+samplingGVal = gVal;
+% samplingSigmaT = 10;
+% samplingAlbedo = 0.95;
+% samplingGVal = 0.5;
 
 %% basic scene info
 iorMedium = 1;
@@ -42,14 +42,16 @@ viewAngle = deg2rad(0);
 viewOrigin = [0.0; 0.0];
 
 %% renderer options
-numPhotons = 1;
-maxDepth = -1;
 % numPhotons = 100000000;
+numPhotons = 100000000;
+maxDepth = -1;
+maxPathlength = -1;
 
 %% image params
 
 viewPlane = [50; 50];
-viewReso = [128; 128];
+pathlengthRange = [-1; -1];
+viewReso = [128; 128; 1];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% do not edit below here
@@ -66,11 +68,12 @@ end;
 scene = sceneparams('iorMedium', iorMedium, 'mediumDimensions', mediumDimensions,...
 								'rayOrigin', rayOrigin, 'rayDir', rayDir, 'rayRadius', rayRadius, 'Li', Li,...
 								'viewOrigin', viewOrigin, 'viewDir', viewDir, 'viewY', viewY,...
-								'viewPlane', viewPlane, 'viewReso', viewReso);
+								'viewPlane', viewPlane, 'pathlengthRange', pathlengthRange, 'viewReso', viewReso);
 
 %% create renderer params
 useDirect = 0;			% always keep 0, except for geometric.
-renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons, 'maxDepth', maxDepth);
+renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons,...
+						'maxDepth', maxDepth, 'maxPathlength', maxPathlength);
 
 %% do rendering
 % im and im_alt should be numerically identical;
@@ -80,10 +83,10 @@ renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons, 'ma
 %		simulated and sampling mediums are the same;
 
 % render an image by importance sampling the simulated medium
-% im = renderImage(sigmaT, albedo, gVal, scene, renderer);
+im = renderImage(sigmaT, albedo, gVal, scene, renderer);
 
 % render an image and derivatives by importance sampling the simulated medium
-% [im_alt, dSigmaT, dAlbedo, dGVal] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer);
+[im_alt, dSigmaT, dAlbedo, dGVal] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer);
 
 % render an image and derivatives by importance sampling the alternative sampling medium
 [im_altw, dSigmaTw, dAlbedow, dGValw] = renderDerivImageWeight(sigmaT, albedo, gVal,...

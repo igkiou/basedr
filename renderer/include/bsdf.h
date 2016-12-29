@@ -31,7 +31,15 @@ public:
 	void sample(const tvec::Vec3f &in, const tvec::Vec3f &n,
 				smp::Sampler &sampler, tvec::Vec3f &out) const;
 
-protected:
+	inline Float getIor1() const {
+		return m_ior1;
+	}
+
+	inline Float getIor2() const {
+		return m_ior2;
+	}
+
+private:
 	Float m_ior1;
 	Float m_ior2;
 };

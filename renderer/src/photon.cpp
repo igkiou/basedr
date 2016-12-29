@@ -37,24 +37,24 @@ void Renderer::scatter(const tvec::Vec3f &p, const tvec::Vec3f &d,
 
 	if ((medium.getAlbedo() > FPCONST(0.0)) && ((medium.getAlbedo() >= FPCONST(1.0)) || (sampler() < medium.getAlbedo()))) {
 		tvec::Vec3f pos(p), dir(d);
-		Float totalDist = FPCONST(0.0);
-		int depth = 0;
 
 		Float cosTheta = FPCONST(0.0);
 		Float dist = getMoveStep(medium, sampler);
 		if (!scene.movePhoton(pos, dir, dist, sampler)) {
 			return;
 		}
-		++depth;
-		totalDist += dist;
-		while (m_maxDepth < 0 || depth <= m_maxDepth) {
+
+		int depth = 1;
+		Float totalDist = dist;
+		while ((m_maxDepth < 0 || depth <= m_maxDepth) &&
+				(m_maxPathlength < 0 || totalDist <= m_maxPathlength)) {
 			scene.addEnergy(img, pos, dir, totalDist, weight, medium);
 
 			if (!scatterOnce(pos, dir, dist, cosTheta, scene, medium, sampler)) {
 				break;
 			}
-			++depth;
 			totalDist += dist;
+			++depth;
 		}
 	}
 }
@@ -82,8 +82,8 @@ void Renderer::scatterDeriv(const tvec::Vec3f &p, const tvec::Vec3f &d,
 		Float sumScoreSigmaT = (FPCONST(1.0) - medium.getSigmaT() * dist);
 		Float sumScoreAlbedo = FPCONST(1.0) / medium.getAlbedo();
 		Float sumScoreGVal = FPCONST(0.0);
-		while (m_maxDepth < 0 || depth <= m_maxDepth) {
-
+		while ((m_maxDepth < 0 || depth <= m_maxDepth) &&
+				(m_maxPathlength < 0 || totalDist <= m_maxPathlength)) {
 			scene.addEnergyDeriv(img, dSigmaT, dAlbedo, dGVal, pos, dir,
 							totalDist, weight, sumScoreSigmaT, sumScoreAlbedo,
 							sumScoreGVal, medium);
@@ -155,8 +155,8 @@ void Renderer::scatterDerivWeight(const tvec::Vec3f &p, const tvec::Vec3f &d,
 		Float sumScoreSigmaT = (FPCONST(1.0) - medium.getSigmaT() * dist);
 		Float sumScoreAlbedo = FPCONST(1.0) / medium.getAlbedo();
 		Float sumScoreGVal = FPCONST(0.0);
-		while (m_maxDepth < 0 || depth <= m_maxDepth) {
-
+		while ((m_maxDepth < 0 || depth <= m_maxDepth) &&
+				(m_maxPathlength < 0 || totalDist <= m_maxPathlength)) {
 #ifdef USE_PRINTING
 		std::cout << "total to add = " << totalDist << std::endl;
 #endif
@@ -202,7 +202,7 @@ void Renderer::renderImage(image::SmallImage &img0,
 
 	smp::SamplerSet sampler(numThreads);
 
-	image::SmallImageSet img(img0.getXRes(), img0.getYRes(), numThreads);
+	image::SmallImageSet img(img0.getXRes(), img0.getYRes(), img0.getZRes(), numThreads);
 	img.zero();
 
 	Float weight = getWeight(medium, scene, numPhotons);
@@ -255,16 +255,16 @@ void Renderer::renderDerivImage(image::SmallImage &img0, image::SmallImage &dSig
 
 	smp::SamplerSet sampler(numThreads);
 
-	image::SmallImageSet img(img0.getXRes(), img0.getYRes(), numThreads);
+	image::SmallImageSet img(img0.getXRes(), img0.getYRes(), img0.getZRes(), numThreads);
 	img.zero();
 
-	image::SmallImageSet dSigmaT(dSigmaT0.getXRes(), dSigmaT0.getYRes(), numThreads);
+	image::SmallImageSet dSigmaT(dSigmaT0.getXRes(), dSigmaT0.getYRes(), dSigmaT0.getZRes(), numThreads);
 	dSigmaT.zero();
 
-	image::SmallImageSet dAlbedo(dAlbedo0.getXRes(), dAlbedo0.getYRes(), numThreads);
+	image::SmallImageSet dAlbedo(dAlbedo0.getXRes(), dAlbedo0.getYRes(), dAlbedo0.getZRes(), numThreads);
 	dAlbedo.zero();
 
-	image::SmallImageSet dGVal(dGVal0.getXRes(), dGVal0.getYRes(), numThreads);
+	image::SmallImageSet dGVal(dGVal0.getXRes(), dGVal0.getYRes(), dGVal0.getZRes(), numThreads);
 	dGVal.zero();
 
 	Float weight = getWeight(medium, scene, numPhotons);
@@ -321,16 +321,16 @@ void Renderer::renderDerivImageWeight(image::SmallImage &img0, image::SmallImage
 
 	smp::SamplerSet sampler(numThreads);
 
-	image::SmallImageSet img(img0.getXRes(), img0.getYRes(), numThreads);
+	image::SmallImageSet img(img0.getXRes(), img0.getYRes(), img0.getZRes(), numThreads);
 	img.zero();
 
-	image::SmallImageSet dSigmaT(dSigmaT0.getXRes(), dSigmaT0.getYRes(), numThreads);
+	image::SmallImageSet dSigmaT(dSigmaT0.getXRes(), dSigmaT0.getYRes(), dSigmaT0.getZRes(), numThreads);
 	dSigmaT.zero();
 
-	image::SmallImageSet dAlbedo(dAlbedo0.getXRes(), dAlbedo0.getYRes(), numThreads);
+	image::SmallImageSet dAlbedo(dAlbedo0.getXRes(), dAlbedo0.getYRes(), dAlbedo0.getZRes(), numThreads);
 	dAlbedo.zero();
 
-	image::SmallImageSet dGVal(dGVal0.getXRes(), dGVal0.getYRes(), numThreads);
+	image::SmallImageSet dGVal(dGVal0.getXRes(), dGVal0.getYRes(), dGVal0.getZRes(), numThreads);
 	dGVal.zero();
 
 	Float weight = getWeight(medium, scene, numPhotons);

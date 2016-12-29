@@ -25,12 +25,14 @@ namespace photon {
 
 class Renderer {
 public:
-	Renderer(const Float maxDepth, const bool useDirect)
-			: m_maxDepth(maxDepth),
-			  m_useDirect(useDirect) {
+	Renderer(const int maxDepth, const Float maxPathlength, const bool useDirect) :
+			m_maxDepth(maxDepth),
+			m_maxPathlength(maxPathlength),
+			m_useDirect(useDirect) {
 #ifndef NDEBUG
-	std::cout << "maxDepth " << m_maxDepth << std::endl;
-	std::cout << "useDirect " << m_useDirect << std::endl;
+		std::cout << "maxDepth " << m_maxDepth << std::endl;
+		std::cout << "maxPathlength " << m_maxPathlength << std::endl;
+		std::cout << "useDirect " << m_useDirect << std::endl;
 #endif
 	}
 
@@ -90,8 +92,12 @@ public:
 					const med::Medium &medium, const med::Medium &samplingMedium,
 					const scn::Scene &scene, const int64 numPhotons) const;
 
-	inline Float getMaxDepth() const {
+	inline int getMaxDepth() const {
 		return m_maxDepth;
+	}
+
+	inline Float getMaxPathlength() const {
+		return m_maxPathlength;
 	}
 
 	inline bool getUseDirect() const {
@@ -101,7 +107,8 @@ public:
 	~Renderer() { }
 
 protected:
-	Float m_maxDepth;
+	int m_maxDepth;
+	Float m_maxPathlength;
 	bool m_useDirect;
 };
 

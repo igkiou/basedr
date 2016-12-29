@@ -379,8 +379,8 @@ private:
 	Image3<T> *m_images;
 };
 
-typedef Image2<Float> SmallImage;
-typedef Image2Set<Float> SmallImageSet;
+typedef Image3<Float> SmallImage;
+typedef Image3Set<Float> SmallImageSet;
 typedef Image3<Float> TransientImage;
 typedef Image3Set<Float> TransientImageSet;
 

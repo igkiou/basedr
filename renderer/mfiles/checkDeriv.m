@@ -42,14 +42,16 @@ viewAngle = deg2rad(0);
 viewOrigin = [0.0; 0.0];
 
 %% renderer options
+% numPhotons = 100000000;
 numPhotons = 100000000;
 maxDepth = -1;
-% numPhotons = 100000000;
+maxPathlength = -1;
 
 %% image params
 
 viewPlane = [50; 50];
-viewReso = [128; 128];
+pathlengthRange = [-1; -1];
+viewReso = [128; 128; 1];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% do not edit below here
@@ -66,11 +68,12 @@ end;
 scene = sceneparams('iorMedium', iorMedium, 'mediumDimensions', mediumDimensions,...
 								'rayOrigin', rayOrigin, 'rayDir', rayDir, 'rayRadius', rayRadius, 'Li', Li,...
 								'viewOrigin', viewOrigin, 'viewDir', viewDir, 'viewY', viewY,...
-								'viewPlane', viewPlane, 'viewReso', viewReso);
+								'viewPlane', viewPlane, 'pathlengthRange', pathlengthRange, 'viewReso', viewReso);
 
 %% create renderer params
 useDirect = 0;			% always keep 0, except for geometric.
-renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons, 'maxDepth', maxDepth);
+renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons,...
+						'maxDepth', maxDepth, 'maxPathlength', maxPathlength);
 
 %% check derivatives
 

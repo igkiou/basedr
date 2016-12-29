@@ -31,7 +31,11 @@ public:
 	Float sample(const tvec::Vec3f &in, smp::Sampler &sampler,
 						tvec::Vec3f &out)  const;
 
-protected:
+	inline Float getG() const {
+		return m_g;
+	}
+
+private:
 	Float m_g;
 };
 

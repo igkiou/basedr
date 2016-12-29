@@ -48,7 +48,8 @@ int main() {
 	const tvec::Vec3f viewDir(-FPCONST(1.0), FPCONST(0.0), FPCONST(0.0));
 	const tvec::Vec3f viewY(FPCONST(0.0), FPCONST(0.0), -FPCONST(1.0));
 	const tvec::Vec2f viewPlane(FPCONST(20.0), FPCONST(20.0));
-	const tvec::Vec2i viewReso(128, 128);
+	const tvec::Vec2f pathlengthRange(-FPCONST(1.0), -FPCONST(1.0));
+	const tvec::Vec3i viewReso(128, 128, 1);
 
 	/*
 	 * Initialize rendering parameters.
@@ -57,6 +58,7 @@ int main() {
 //	const int64 numPhotons = 50000L;
 //	const int64 numPhotons = 20000000L;
 	const int maxDepth = -1;
+	const Float maxPathlength = -1;
 	const bool useDirect = false;
 
 	printf("\nnum photons = %ld\n", numPhotons);
@@ -68,25 +70,25 @@ int main() {
 									samplingPhase);
 	const scn::Scene scene(iorMedium, mediumL, mediumR,
 						rayOrigin, rayDir, rayRadius, Li,
-						viewOrigin, viewDir, viewY, viewPlane);
+						viewOrigin, viewDir, viewY, viewPlane, pathlengthRange);
 
-	photon::Renderer renderer(maxDepth, useDirect);
+	photon::Renderer renderer(maxDepth, maxPathlength, useDirect);
 
 
-	image::SmallImage img(viewReso.x, viewReso.y);
+	image::SmallImage img(viewReso.x, viewReso.y, viewReso.z);
 	renderer.renderImage(img, medium, scene, numPhotons);
 
-	image::SmallImage img_alt(viewReso.x, viewReso.y);
-	image::SmallImage dSigmaT(viewReso.x, viewReso.y);
-	image::SmallImage dAlbedo(viewReso.x, viewReso.y);
-	image::SmallImage dGVal(viewReso.x, viewReso.y);
+	image::SmallImage img_alt(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dSigmaT(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dAlbedo(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dGVal(viewReso.x, viewReso.y, viewReso.z);
 	renderer.renderDerivImage(img_alt, dSigmaT, dAlbedo, dGVal,
 							medium, scene, numPhotons);
 
-	image::SmallImage img_alt_weight(viewReso.x, viewReso.y);
-	image::SmallImage dSigmaT_weight(viewReso.x, viewReso.y);
-	image::SmallImage dAlbedo_weight(viewReso.x, viewReso.y);
-	image::SmallImage dGVal_weight(viewReso.x, viewReso.y);
+	image::SmallImage img_alt_weight(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dSigmaT_weight(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dAlbedo_weight(viewReso.x, viewReso.y, viewReso.z);
+	image::SmallImage dGVal_weight(viewReso.x, viewReso.y, viewReso.z);
 	renderer.renderDerivImageWeight(img_alt_weight, dSigmaT_weight,
 								dAlbedo_weight, dGVal_weight,
 								medium, samplingMedium, scene, numPhotons);

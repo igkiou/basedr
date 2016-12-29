@@ -86,14 +86,16 @@ protected:
 
 struct Camera {
 
-	Camera(const tvec::Vec2f &viewOrigin,
-		const tvec::Vec3f &viewDir,
-		const tvec::Vec3f &viewY,
-		const tvec::Vec2f &viewPlane)
-		: m_viewOrigin(viewOrigin),
-		  m_viewDir(viewDir),
-		  m_viewY(viewY),
-		  m_viewPlane(viewPlane) {
+	Camera(const tvec::Vec2f &viewOrigin, const tvec::Vec3f &viewDir,
+		const tvec::Vec3f &viewY, const tvec::Vec2f &viewPlane,
+		const tvec::Vec2f &pathlengthRange) :
+			m_viewOrigin(viewOrigin),
+			m_viewDir(viewDir),
+			m_viewY(viewY),
+			m_viewPlane(viewPlane),
+			m_pathlengthRange(pathlengthRange) {
+		Assert(((m_pathlengthRange.x == -FPCONST(1.0)) && (m_pathlengthRange.y == -FPCONST(1.0))) ||
+				((m_pathlengthRange.x >= 0) && (m_pathlengthRange.y >= m_pathlengthRange.x)));
 		m_viewDir.normalize();
 		m_viewY.normalize();
 		/*
@@ -101,13 +103,12 @@ struct Camera {
 		 */
 //		m_viewX = tvec::cross(m_viewDir, m_viewY);
 		m_viewX = tvec::cross(m_viewY, m_viewDir);
-
-#ifdef USE_PRINTING
-		std::cout << "viewDir " << m_viewDir.x << " " << m_viewDir.y << " " << m_viewDir.z << std::endl;
-		std::cout << "viewY " << m_viewY.x << " " << m_viewY.y << " " << m_viewY.z << std::endl;
-		std::cout << "viewX " << m_viewX.x << " " << m_viewX.y << " " << m_viewX.z << std::endl;
-#endif
 	}
+
+	Camera(const tvec::Vec2f &viewOrigin, const tvec::Vec3f &viewDir,
+		const tvec::Vec3f &viewY, const tvec::Vec2f &viewPlane) :
+			Camera(viewOrigin, viewDir, viewY, viewPlane,
+				tvec::Vec2f(-FPCONST(1.0), -FPCONST(1.0))) {	}
 
 	inline const tvec::Vec2f& getViewOrigin() const {
 		return m_viewOrigin;
@@ -129,6 +130,10 @@ struct Camera {
 		return m_viewPlane;
 	}
 
+	inline const tvec::Vec2f& getPathlengthRange() const {
+		return m_pathlengthRange;
+	}
+
 	virtual ~Camera() { }
 
 protected:
@@ -137,6 +142,7 @@ protected:
 	tvec::Vec3f m_viewY;
 	tvec::Vec3f m_viewX;
 	tvec::Vec2f m_viewPlane;
+	tvec::Vec2f m_pathlengthRange;
 };
 
 struct RaySource {
@@ -239,13 +245,14 @@ public:
 			const tvec::Vec2f &viewOrigin,
 			const tvec::Vec3f &viewDir,
 			const tvec::Vec3f &viewY,
-			const tvec::Vec2f &viewPlane) :
+			const tvec::Vec2f &viewPlane,
+			const tvec::Vec2f &pathlengthRange) :
 				m_mediumIor(mediumIor),
 				m_fresnelTrans(FPCONST(1.0)),
 				m_refrDir(FPCONST(1.0), FPCONST(0.0), FPCONST(0.0)),
 				m_mediumBlock(mediumBlockL, mediumBlockR),
 				m_source(rayOrigin, rayDir, rayRadius, Li),
-				m_camera(viewOrigin, viewDir, viewY, viewPlane),
+				m_camera(viewOrigin, viewDir, viewY, viewPlane, pathlengthRange),
 				m_bsdf(FPCONST(1.0), mediumIor) {
 
 		Assert(((std::abs(m_source.getOrigin().x - m_mediumBlock.getBlockL().x) < M_EPSILON) && (m_source.getDir().x > FPCONST(0.0)))||
@@ -277,11 +284,6 @@ public:
 				m_refZ.z *= -FPCONST(1.0);
 			}
 		}
-#ifdef USE_PRINTING
-		std::cout << "refX " << m_refX.x << " " << m_refX.y << " " << m_refX.z << std::endl;
-		std::cout << "refY " << m_refY.x << " " << m_refY.y << " " << m_refY.z << std::endl;
-		std::cout << "refZ " << m_refZ.x << " " << m_refZ.y << " " << m_refZ.z << std::endl;
-#endif
 
 		m_refrDir.y = m_source.getDir().y / m_mediumIor;
 		m_refrDir.z = m_source.getDir().z / m_mediumIor;
@@ -293,10 +295,24 @@ public:
 		m_fresnelTrans = FPCONST(1.0) - util::fresnelDielectric(m_source.getDir().x, m_refrDir.x, m_mediumIor);
 #endif
 #ifdef USE_PRINTING
-		std::cout << "refrDir " << m_refrDir.x << " " << m_refrDir.y << " " << m_refrDir.z << std::endl;
 		std::cout << "fresnel " << m_fresnelTrans << std::endl;
 #endif
 	}
+
+	Scene(const Float mediumIor,
+				const tvec::Vec3f &mediumBlockL,
+				const tvec::Vec3f &mediumBlockR,
+				const tvec::Vec3f &rayOrigin,
+				const tvec::Vec3f &rayDir,
+				const Float rayRadius,
+				const Float Li,
+				const tvec::Vec2f &viewOrigin,
+				const tvec::Vec3f &viewDir,
+				const tvec::Vec3f &viewY,
+				const tvec::Vec2f &viewPlane) :
+			Scene(mediumIor, mediumBlockL, mediumBlockR, rayOrigin, rayDir,
+				rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane,
+				tvec::Vec2f(-FPCONST(1.0), -FPCONST(1.0))) { }
 
 	/*
 	 * TODO: Inline these methods in implementations.
@@ -306,12 +322,13 @@ public:
 	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler) const;
 	bool genRay(tvec::Vec3f &pos, tvec::Vec3f &dir, smp::Sampler &sampler,
 				tvec::Vec3f &possrc, tvec::Vec3f &dirsrc) const;
-	void addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float val) const;
+	void addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p,
+						Float pathlength, Float val) const;
 
-	inline void addPixel(image::SmallImage &img, int x, int y, Float val) const {
-
-		if (x >= 0 && x < img.getXRes() && y >= 0 && y < img.getYRes()) {
-			img.addEnergy(x, y, static_cast<Float>(val));
+	inline void addPixel(image::SmallImage &img, int x, int y, int z, Float val) const {
+		if (x >= 0 && x < img.getXRes() && y >= 0 && y < img.getYRes() &&
+			z >= 0 && z < img.getZRes()) {
+			img.addEnergy(x, y, z, static_cast<Float>(val));
 		}
 	}
 

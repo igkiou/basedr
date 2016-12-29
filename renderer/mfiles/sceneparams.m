@@ -15,7 +15,8 @@ params.viewOrigin = [0.0; 0.0];
 params.viewDir = [-1.0; 0.0; 0.0];
 params.viewY = [0.0; 0.0; -1.0];
 params.viewPlane = [5; 5];
-params.viewReso = [128; 128];
+params.pathlengthRange = [-1; -1];
+params.viewReso = [128; 128; 1];
 								
 % check for incorrect inputs
 if (mod(length(varargin), 2) ~= 0)

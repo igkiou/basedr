@@ -218,7 +218,8 @@ bool Scene::movePhoton(tvec::Vec3f &p, tvec::Vec3f &d, Float dist,
 	return true;
 }
 
-void Scene::addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float val) const {
+void Scene::addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p,
+							Float pathlength, Float val) const {
 	/*
 	 * TODO: Changed sign for y, to make camera coordinate system right-hand.
 	 */
@@ -226,26 +227,36 @@ void Scene::addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p, Float
 	Float x = tvec::dot(m_camera.getViewX(), p) - m_camera.getViewOrigin().x;
 	Float y = tvec::dot(m_camera.getViewY(), p) - m_camera.getViewOrigin().y;
 
-	if (std::abs(x) < FPCONST(0.5)*m_camera.getViewPlane().x && std::abs(y) < FPCONST(0.5)*m_camera.getViewPlane().y) {
+	if (((std::abs(x) < FPCONST(0.5)*m_camera.getViewPlane().x) && (std::abs(y) < FPCONST(0.5)*m_camera.getViewPlane().y)) &&
+		(((m_camera.getPathlengthRange().x == -1) && (m_camera.getPathlengthRange().y == -1)) ||
+		((pathlength >= m_camera.getPathlengthRange().x) && (pathlength <= m_camera.getPathlengthRange().y)))) {
 		x = (x / m_camera.getViewPlane().x + FPCONST(0.5)) * static_cast<Float>(img.getXRes());
-		y = (y / m_camera.getViewPlane().y + FPCONST(0.5)) * static_cast<Float>(img.getXRes());
+		y = (y / m_camera.getViewPlane().y + FPCONST(0.5)) * static_cast<Float>(img.getYRes());
 
 //		int ix = static_cast<int>(img.getXRes()/2) + static_cast<int>(std::floor(x));
 //		int iy = static_cast<int>(img.getYRes()/2) + static_cast<int>(std::floor(y));
 		int ix = static_cast<int>(std::floor(x));
 		int iy = static_cast<int>(std::floor(y));
 
+		int iz;
+		if ((m_camera.getPathlengthRange().x == -1) && (m_camera.getPathlengthRange().y == -1)) {
+			iz = 0;
+		} else {
+			Float z = pathlength - m_camera.getPathlengthRange().x;
+			Float range = m_camera.getPathlengthRange().y - m_camera.getPathlengthRange().x;
+			z = (z / range) * static_cast<Float>(img.getZRes());
+			iz = static_cast<int>(std::floor(z));
+		}
 #ifdef USE_PIXEL_SHARING
 		Float fx = x - std::floor(x);
 		Float fy = y - std::floor(y);
 
-
-		addPixel(img, ix, iy, val*(FPCONST(1.0) - fx)*(FPCONST(1.0) - fy));
-		addPixel(img, ix + 1, iy, val*fx*(FPCONST(1.0) - fy));
-		addPixel(img, ix, iy + 1, val*(FPCONST(1.0) - fx)*fy);
-		addPixel(img, ix + 1, iy + 1, val*fx*fy);
+		addPixel(img, ix, iy, iz, val*(FPCONST(1.0) - fx)*(FPCONST(1.0) - fy));
+		addPixel(img, ix + 1, iy, iz, val*fx*(FPCONST(1.0) - fy));
+		addPixel(img, ix, iy + 1, iz, val*(FPCONST(1.0) - fx)*fy);
+		addPixel(img, ix + 1, iy + 1, iz, val*fx*fy);
 #else
-		addPixel(img, ix, iy, val);
+		addPixel(img, ix, iy, iz, val);
 #endif
     }
 }
@@ -309,7 +320,7 @@ void Scene::addEnergy(image::SmallImage &img,
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
 			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX);
-			addEnergyToImage(img, q, val1);
+			addEnergyToImage(img, q, (distTravelled + t) * m_bsdf.getIor2(), val1);
 		}
 	}
 
@@ -319,7 +330,7 @@ void Scene::addEnergy(image::SmallImage &img,
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
 			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX);
-			addEnergyToImage(img, q, val1);
+			addEnergyToImage(img, q, (distTravelled + t) * m_bsdf.getIor2(), val1);
 		}
 	}
 
@@ -329,7 +340,7 @@ void Scene::addEnergy(image::SmallImage &img,
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
 			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, m_refX);
-			addEnergyToImage(img, q, val1);
+			addEnergyToImage(img, q, (distTravelled + t) * m_bsdf.getIor2(), val1);
 		}
 	}
 //	Assert((refD == m_refX) || (refD == m_refY) || (refD == m_refZ));
@@ -366,13 +377,13 @@ void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
 			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, refD);
-			addEnergyToImage(img, q, val1);
+			addEnergyToImage(img, q, (distTravelled + t) * m_bsdf.getIor2(), val1);
 			valDSigmaT = val1 * (sumScoreSigmaT - t);
-			addEnergyToImage(dSigmaT, q, valDSigmaT);
+			addEnergyToImage(dSigmaT, q, (distTravelled + t) * m_bsdf.getIor2(), valDSigmaT);
 			valDAlbedo = val1 * sumScoreAlbedo;
-			addEnergyToImage(dAlbedo, q, valDAlbedo);
+			addEnergyToImage(dAlbedo, q, (distTravelled + t) * m_bsdf.getIor2(), valDAlbedo);
 			valDGVal = val1 * (sumScoreGVal + medium.getPhaseFunction()->score(d, refD));
-			addEnergyToImage(dGVal, q, valDGVal);
+			addEnergyToImage(dGVal, q, (distTravelled + t) * m_bsdf.getIor2(), valDGVal);
 		}
 	}
 
@@ -385,13 +396,13 @@ void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
 			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, refD);
-			addEnergyToImage(img, q, val1);
+			addEnergyToImage(img, q, (distTravelled + t) * m_bsdf.getIor2(), val1);
 			valDSigmaT = val1 * (sumScoreSigmaT - t);
-			addEnergyToImage(dSigmaT, q, valDSigmaT);
+			addEnergyToImage(dSigmaT, q, (distTravelled + t) * m_bsdf.getIor2(), valDSigmaT);
 			valDAlbedo = val1 * sumScoreAlbedo;
-			addEnergyToImage(dAlbedo, q, valDAlbedo);
+			addEnergyToImage(dAlbedo, q, (distTravelled + t) * m_bsdf.getIor2(), valDAlbedo);
 			valDGVal = val1 * (sumScoreGVal + medium.getPhaseFunction()->score(d, refD));
-			addEnergyToImage(dGVal, q, valDGVal);
+			addEnergyToImage(dGVal, q, (distTravelled + t) * m_bsdf.getIor2(), valDGVal);
 		}
 	}
 
@@ -404,13 +415,13 @@ void Scene::addEnergyDeriv(image::SmallImage &img, image::SmallImage &dSigmaT,
 		q = p + t*refD;
 		if (m_mediumBlock.inside(q)) {
 			val1 = val * std::exp(-medium.getSigmaT()*t)*medium.getPhaseFunction()->f(d, refD);
-			addEnergyToImage(img, q, val1);
+			addEnergyToImage(img, q, (distTravelled + t) * m_bsdf.getIor2(), val1);
 			valDSigmaT = val1 * (sumScoreSigmaT - t);
-			addEnergyToImage(dSigmaT, q, valDSigmaT);
+			addEnergyToImage(dSigmaT, q, (distTravelled + t) * m_bsdf.getIor2(), valDSigmaT);
 			valDAlbedo = val1 * sumScoreAlbedo;
-			addEnergyToImage(dAlbedo, q, valDAlbedo);
+			addEnergyToImage(dAlbedo, q, (distTravelled + t) * m_bsdf.getIor2(), valDAlbedo);
 			valDGVal = val1 * (sumScoreGVal + medium.getPhaseFunction()->score(d, refD));
-			addEnergyToImage(dGVal, q, valDGVal);
+			addEnergyToImage(dGVal, q, (distTravelled + t) * m_bsdf.getIor2(), valDGVal);
 		}
 	}
 }
@@ -435,7 +446,7 @@ void Scene::addEnergyDirect(image::SmallImage &img,
 		q = p + t*m_refX;
 		if (m_mediumBlock.inside(q)) {
 			if (d.aproxEqual(m_refX)) {
-				addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t));
+				addEnergyToImage(img, q, 0, val*std::exp(-medium.getSigmaT()*t));
 			}
 		}
 	}
@@ -445,7 +456,7 @@ void Scene::addEnergyDirect(image::SmallImage &img,
 		q = p + t*m_refY;
 		if (m_mediumBlock.inside(q)) {
 			if (d.aproxEqual(m_refY)) {
-				addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t));
+				addEnergyToImage(img, q, 0, val*std::exp(-medium.getSigmaT()*t));
 			}
 		}
 	}
@@ -455,7 +466,7 @@ void Scene::addEnergyDirect(image::SmallImage &img,
 		q = p + t*m_refZ;
 		if (m_mediumBlock.inside(q)) {
 			if (d.aproxEqual(m_refZ)) {
-				addEnergyToImage(img, q, val*std::exp(-medium.getSigmaT()*t));
+				addEnergyToImage(img, q, 0, val*std::exp(-medium.getSigmaT()*t));
 			}
 		}
 	}
