@@ -139,7 +139,7 @@ else
 endif
 
 ifeq ($(USE_MATLAB), 1)
-all: mexfiles
+all: mexfiles samples
 else
 all: samples
 endif

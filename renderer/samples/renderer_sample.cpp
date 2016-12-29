@@ -13,9 +13,15 @@ int main() {
 	 * Initialize scattering parameters.
 	 */
 	const Float sigmaT = FPCONST(10.0);
-	const Float albedo = FPCONST(1.0);
+	const Float albedo = FPCONST(0.9);
 	const Float gVal = FPCONST(0.8);
 	pfunc::HenyeyGreenstein *phase = new pfunc::HenyeyGreenstein(gVal);
+
+	const Float samplingSigmaT = FPCONST(1.0);
+	const Float samplingAlbedo = FPCONST(0.95);
+	const Float samplingGVal = FPCONST(0.0);
+	pfunc::HenyeyGreenstein *samplingPhase = new pfunc::HenyeyGreenstein(
+																samplingGVal);
 
 	/*
 	 * Initialize scene parameters.
@@ -30,7 +36,8 @@ int main() {
 	const tvec::Vec3f rayOrigin(mediumL.x, FPCONST(0.0), FPCONST(0.0));
 //	const Float rayAngle = -FPCONST(0.5236);
 	const Float rayAngle = FPCONST(0.0);
-	const tvec::Vec3f rayDir(std::cos(rayAngle), std::sin(rayAngle), FPCONST(0.0));
+	const tvec::Vec3f rayDir(std::cos(rayAngle), std::sin(rayAngle),
+							FPCONST(0.0));
 	const Float rayRadius = FPCONST(0.5);
 	const Float Li = FPCONST(75000.0);
 
@@ -57,14 +64,35 @@ int main() {
 	printf("Li = %.2f\n", Li);
 
 	const med::Medium medium(sigmaT, albedo, phase);
-	const scn::Scene scene(iorMedium, mediumL, mediumR, rayOrigin, rayDir, rayRadius, Li, viewOrigin, viewDir, viewY, viewPlane);
-	image::SmallImage img0(viewReso.x, viewReso.y);
+	const med::Medium samplingMedium(samplingSigmaT, samplingAlbedo,
+									samplingPhase);
+	const scn::Scene scene(iorMedium, mediumL, mediumR,
+						rayOrigin, rayDir, rayRadius, Li,
+						viewOrigin, viewDir, viewY, viewPlane);
 
 	photon::Renderer renderer(maxDepth, useDirect);
-	renderer.renderImage(img0, medium, scene, numPhotons);
 
-	const std::string ofname("out.pfm");
-	img0.writeToFile(ofname);
+
+	image::SmallImage img(viewReso.x, viewReso.y);
+	renderer.renderImage(img, medium, scene, numPhotons);
+
+	image::SmallImage img_alt(viewReso.x, viewReso.y);
+	image::SmallImage dSigmaT(viewReso.x, viewReso.y);
+	image::SmallImage dAlbedo(viewReso.x, viewReso.y);
+	image::SmallImage dGVal(viewReso.x, viewReso.y);
+	renderer.renderDerivImage(img_alt, dSigmaT, dAlbedo, dGVal,
+							medium, scene, numPhotons);
+
+	image::SmallImage img_alt_weight(viewReso.x, viewReso.y);
+	image::SmallImage dSigmaT_weight(viewReso.x, viewReso.y);
+	image::SmallImage dAlbedo_weight(viewReso.x, viewReso.y);
+	image::SmallImage dGVal_weight(viewReso.x, viewReso.y);
+	renderer.renderDerivImageWeight(img_alt_weight, dSigmaT_weight,
+								dAlbedo_weight, dGVal_weight,
+								medium, samplingMedium, scene, numPhotons);
+
+//	const std::string ofname("out.pfm");
+//	img0.writeToFile(ofname);
 
 	delete phase;
 
