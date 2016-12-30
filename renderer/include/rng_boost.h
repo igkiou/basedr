@@ -1,7 +1,7 @@
 /*
- * acquisition_simulation//acquisition_simulation/renderer_lnx/include/rng_boost.h/rng_boost.h
+ * rng_boost.h
  *
- *  Created on: Mar 28, 2013
+ *  Created on: Nov 28, 2015
  *      Author: igkiou
  */
 

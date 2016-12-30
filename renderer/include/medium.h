@@ -1,7 +1,7 @@
 /*
  * medium.h
  *
- *  Created on: Sep 3, 2012
+ *  Created on: Nov 3, 2015
  *      Author: igkiou
  */
 
@@ -20,58 +20,6 @@
 #include "util.h"
 
 namespace med {
-
-//struct Medium {
-//
-//	Medium(const Float sigmaT, const Float sigmaS, pfunc::HenyeyGreenstein *phase)
-//		: m_sigmaT(sigmaT),
-//		  m_sigmaS(sigmaS),
-//		  m_sigmaA(sigmaT - sigmaS),
-//		  m_mfp(FPCONST(1.0) / sigmaT),
-//		  m_albedo(sigmaS / sigmaT),
-//		  m_phase(phase) {
-//		Assert(m_sigmaA >= 0);
-//		if (m_sigmaT <= M_EPSILON) {
-//			m_sigmaT = FPCONST(0.0);
-//			m_mfp = FPCONST(1.0);
-//			m_albedo = FPCONST(0.0);
-//		}
-//	}
-//
-//	inline Float getSigmaT() const {
-//		return m_sigmaT;
-//	}
-//
-//	inline Float getSigmaS() const {
-//		return m_sigmaS;
-//	}
-//
-//	inline Float getSigmaA() const {
-//		return m_sigmaA;
-//	}
-//
-//	inline Float getMfp() const {
-//		return m_mfp;
-//	}
-//
-//	inline Float getAlbedo() const {
-//		return m_albedo;
-//	}
-//
-//	inline const pfunc::HenyeyGreenstein *getPhaseFunction() const {
-//		return m_phase;
-//	}
-//
-//	virtual ~Medium() { }
-//
-//protected:
-//	Float m_sigmaT;
-//	Float m_sigmaS;
-//	Float m_sigmaA;
-//	Float m_mfp;
-//	Float m_albedo;
-//	pfunc::HenyeyGreenstein *m_phase;
-//};
 
 struct Medium {
 

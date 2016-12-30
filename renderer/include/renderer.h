@@ -1,3 +1,10 @@
+/*
+ * renderer.h
+ *
+ *  Created on: Nov 21, 2015
+ *      Author: igkiou
+ */
+
 #ifndef RENDERER_H_
 #define RENDERER_H_
 

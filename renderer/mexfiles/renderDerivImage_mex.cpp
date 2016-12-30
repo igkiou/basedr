@@ -1,7 +1,7 @@
 /*
  * renderDerivImage_mex.cpp
  *
- *  Created on: Sep 5, 2012
+ *  Created on: Dec 5, 2015
  *      Author: igkiou
  */
 

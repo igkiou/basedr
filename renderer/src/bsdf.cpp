@@ -1,12 +1,11 @@
 /*
  * bsdf.cpp
  *
- *  Created on: Jan 29, 2013
+ *  Created on: Nov 29, 2015
  *      Author: igkiou
  */
 
-#include "../include/bsdf.h"
-
+#include "bsdf.h"
 #include "util.h"
 #include "constants.h"
 

@@ -12,7 +12,6 @@
 #include <stdarg.h>
 
 // Inspired by mitsuba-0.4.1
-// TODO: Add mitsuba copyright.
 #ifdef NDEBUG
 #define Assert(cond) ((void) 0)
 #define AssertEx(cond, explanation) ((void) 0)

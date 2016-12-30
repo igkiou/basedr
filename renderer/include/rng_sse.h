@@ -1,7 +1,7 @@
 /*
  * rng_sse.h
  *
- *  Created on: Dec 24, 2012
+ *  Created on: Nov 24, 2015
  *      Author: igkiou
  */
 

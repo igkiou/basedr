@@ -1,7 +1,7 @@
 /*
  * image.h
  *
- *  Created on: Jul 30, 2012
+ *  Created on: Nov 30, 2015
  *      Author: igkiou
  */
 
@@ -381,8 +381,6 @@ private:
 
 typedef Image3<Float> SmallImage;
 typedef Image3Set<Float> SmallImageSet;
-typedef Image3<Float> TransientImage;
-typedef Image3Set<Float> TransientImageSet;
 
 } /* namespace image */
 

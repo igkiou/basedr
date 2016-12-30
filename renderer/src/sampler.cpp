@@ -1,7 +1,7 @@
 /*
  * sampler.cpp
  *
- *  Created on: Jul 30, 2012
+ *  Created on: Nov 30, 2015
  *      Author: igkiou
  */
 

@@ -1,7 +1,7 @@
 /*
- * renderer.cpp
+ * renderer_sample.cpp
  *
- *  Created on: Jul 20, 2012
+ *  Created on: Nov 20, 2015
  *      Author: igkiou
  */
 
@@ -17,6 +17,9 @@ int main() {
 	const Float gVal = FPCONST(0.8);
 	pfunc::HenyeyGreenstein *phase = new pfunc::HenyeyGreenstein(gVal);
 
+	/*
+	 * Initialize sampling scattering parameters.
+	 */
 	const Float samplingSigmaT = FPCONST(1.0);
 	const Float samplingAlbedo = FPCONST(0.95);
 	const Float samplingGVal = FPCONST(0.0);
@@ -55,7 +58,6 @@ int main() {
 	 * Initialize rendering parameters.
 	 */
 	const int64 numPhotons = 5000000L;
-//	const int64 numPhotons = 50000L;
 //	const int64 numPhotons = 20000000L;
 	const int maxDepth = -1;
 	const Float maxPathlength = -1;
@@ -63,7 +65,7 @@ int main() {
 
 	printf("\nnum photons = %ld\n", numPhotons);
 	printf("max depth = %d\n", maxDepth);
-	printf("Li = %.2f\n", Li);
+	printf("max pathlength= %lf\n", maxPathlength);
 
 	const med::Medium medium(sigmaT, albedo, phase);
 	const med::Medium samplingMedium(samplingSigmaT, samplingAlbedo,
