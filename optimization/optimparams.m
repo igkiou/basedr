@@ -30,7 +30,7 @@ params.b = 1;		% parameter used for SAGE. Should be robust.
 								
 % check for incorrect inputs
 if (mod(length(varargin),2) ~= 0)
-	error('Invalid input arguments, type help sparseClassificationParams.');
+	error('Invalid input arguments.');
 end;
 
 fieldsList = fieldnames(params);

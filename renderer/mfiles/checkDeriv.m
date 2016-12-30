@@ -12,12 +12,12 @@ albedo = 0.9;
 gVal = 0.8;
 
 % sampling medium (used for path sampling)
-% samplingSigmaT = sigmaT;
-% samplingAlbedo = albedo;
-% samplingGVal = gVal;
-samplingSigmaT = 10;
-samplingAlbedo = 0.95;
-samplingGVal = 0.5;
+samplingSigmaT = sigmaT;
+samplingAlbedo = albedo;
+samplingGVal = gVal;
+% samplingSigmaT = 10;
+% samplingAlbedo = 0.95;
+% samplingGVal = 0.5;
 
 %% basic scene info
 iorMedium = 1;
