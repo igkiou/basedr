@@ -32,7 +32,7 @@ useDirect = renderer.useDirect;
 						rayOrigin, rayDir, rayRadius, Li, ...
 						viewOrigin, viewDir, viewY, viewPlane, pathlengthRange, viewReso, ...
 						numPhotons, maxDepth, maxPathlength, useDirect);
-im = im';
-dSigmaT = dSigmaT';
-dAlbedo = dAlbedo';
-dGVal = dGVal';
+im = permute(im, [2 1 3]);
+dSigmaT = permute(dSigmaT, [2 1 3]);
+dAlbedo = permute(dAlbedo, [2 1 3]);
+dGVal = permute(dGVal, [2 1 3]);

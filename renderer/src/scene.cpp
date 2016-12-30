@@ -229,7 +229,7 @@ void Scene::addEnergyToImage(image::SmallImage &img, const tvec::Vec3f &p,
 
 	if (((std::abs(x) < FPCONST(0.5)*m_camera.getViewPlane().x) && (std::abs(y) < FPCONST(0.5)*m_camera.getViewPlane().y)) &&
 		(((m_camera.getPathlengthRange().x == -1) && (m_camera.getPathlengthRange().y == -1)) ||
-		((pathlength >= m_camera.getPathlengthRange().x) && (pathlength <= m_camera.getPathlengthRange().y)))) {
+		((pathlength > m_camera.getPathlengthRange().x) && (pathlength < m_camera.getPathlengthRange().y)))) {
 		x = (x / m_camera.getViewPlane().x + FPCONST(0.5)) * static_cast<Float>(img.getXRes());
 		y = (y / m_camera.getViewPlane().y + FPCONST(0.5)) * static_cast<Float>(img.getYRes());
 

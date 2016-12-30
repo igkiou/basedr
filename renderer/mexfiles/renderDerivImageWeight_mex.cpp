@@ -121,17 +121,28 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 #else
 	mxClassID matClassID = mxSINGLE_CLASS;
 #endif
-	plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	if (viewReso.z == 1) {
+		plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL);
+		plhs[1] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL);
+		plhs[2] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL);
+		plhs[3] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL);
+	} else {
+		mwSize dims[3];
+		dims[0] = viewReso.y;
+		dims[1] = viewReso.x;
+		dims[2] = viewReso.z;
+		plhs[0] = mxCreateNumericArray(static_cast<mwSize>(3), dims, matClassID, mxREAL);
+		plhs[1] = mxCreateNumericArray(static_cast<mwSize>(3), dims, matClassID, mxREAL);
+		plhs[2] = mxCreateNumericArray(static_cast<mwSize>(3), dims, matClassID, mxREAL);
+		plhs[3] = mxCreateNumericArray(static_cast<mwSize>(3), dims, matClassID, mxREAL);
+	}
 	Float *matImg = (Float *) mxGetData(plhs[0]);
-	img0.copyImage(matImg, viewReso.y * viewReso.x);
-	plhs[1] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	img0.copyImage(matImg, viewReso.y * viewReso.x * viewReso.z);
 	Float *matDSigmaT = (Float *) mxGetData(plhs[1]);
-	dSigmaT0.copyImage(matDSigmaT, viewReso.y * viewReso.x);
-	plhs[2] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	dSigmaT0.copyImage(matDSigmaT, viewReso.y * viewReso.x * viewReso.z);
 	Float *matDAlbedo = (Float *) mxGetData(plhs[2]);
-	dAlbedo0.copyImage(matDAlbedo, viewReso.y * viewReso.x);
-	plhs[3] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	dAlbedo0.copyImage(matDAlbedo, viewReso.y * viewReso.x * viewReso.z);
 	Float *matDGVal = (Float *) mxGetData(plhs[3]);
-	dGVal0.copyImage(matDGVal, viewReso.y * viewReso.x);
+	dGVal0.copyImage(matDGVal, viewReso.y * viewReso.x * viewReso.z);
 	delete phase;
 }

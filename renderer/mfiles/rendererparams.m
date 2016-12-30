@@ -1,13 +1,21 @@
 function params = rendererparams(varargin)
 %% 
+
+%% photon termination criteria
+% max number of bounces (-1 is equivalent to infinite number of bounces)
 params.maxDepth = -1;
+% max pathlength (-1 is equivalent to infinite number of bounces)
 params.maxPathlength = -1;
+
+%% estimate direct component (currently disabled)
 params.useDirect = 0;			% always keep 0, except for geometric.
+
+%% number of photons to use
 params.numPhotons = 500000;
 	
 % check for incorrect inputs
 if (mod(length(varargin), 2) ~= 0)
-	error('Invalid input arguments, type help sparseClassificationParams.');
+	error('Invalid input arguments.');
 end;
 
 fieldsList = fieldnames(params);

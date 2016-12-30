@@ -1,12 +1,13 @@
 %%%%%%%%%%%%%%%%%%
 %%%% setup problem
 
+% all units are in mm
+% see 'sceneparams' and 'rendererparams' for descriptions of the various
+% parameters
+
 %% scattering medium
 
 % simulated medium
-% sigmaT = 10;
-% albedo = 0.9;
-% gVal = 0.3;
 sigmaT = 1;
 albedo = 0.9;
 gVal = 0.8;
@@ -15,7 +16,7 @@ gVal = 0.8;
 samplingSigmaT = sigmaT;
 samplingAlbedo = albedo;
 samplingGVal = gVal;
-% samplingSigmaT = 10;
+% samplingSigmaT = 1;
 % samplingAlbedo = 0.95;
 % samplingGVal = 0.5;
 
@@ -29,10 +30,10 @@ mediumDimensions = [2.5; 100; 100];
 % rayAnglesSet = {[-5; -11.25; -22.5; -45], [-5; -22.5; 185; 202.5], [185; 191.25; 202.5; 225]};
 
 % frontFlag = 1 for frontlighting
-frontFlag = 0;
-rayAngle = deg2rad(-45);
-% frontFlag = 1;
-% rayAngle = deg2rad(225);
+% frontFlag = 0;
+% rayAngle = deg2rad(-45);
+frontFlag = 1;
+rayAngle = deg2rad(225);
 rayRadius = 0.1;
 Li = 75000.0;
 
@@ -42,8 +43,7 @@ viewAngle = deg2rad(0);
 viewOrigin = [0.0; 0.0];
 
 %% renderer options
-% numPhotons = 100000000;
-numPhotons = 100000000;
+numPhotons = 1000000000;
 maxDepth = -1;
 maxPathlength = -1;
 
@@ -52,6 +52,8 @@ maxPathlength = -1;
 viewPlane = [50; 50];
 pathlengthRange = [-1; -1];
 viewReso = [128; 128; 1];
+% pathlengthRange = [0; 100];
+% viewReso = [128; 128; 128];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% do not edit below here
@@ -83,11 +85,11 @@ renderer = rendererparams('useDirect', useDirect', 'numPhotons', numPhotons,...
 %		simulated and sampling mediums are the same;
 
 % render an image by importance sampling the simulated medium
-im = renderImage(sigmaT, albedo, gVal, scene, renderer);
+imss = renderImage(sigmaT, albedo, gVal, scene, renderer);
 
 % render an image and derivatives by importance sampling the simulated medium
-[im_alt, dSigmaT, dAlbedo, dGVal] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer);
+[im_altss, dSigmaTss, dAlbedoss, dGValss] = renderDerivImage(sigmaT, albedo, gVal, scene, renderer);
 
 % render an image and derivatives by importance sampling the alternative sampling medium
-[im_altw, dSigmaTw, dAlbedow, dGValw] = renderDerivImageWeight(sigmaT, albedo, gVal,...
+[im_altwss, dSigmaTwss, dAlbedowss, dGValwss] = renderDerivImageWeight(sigmaT, albedo, gVal,...
 										samplingSigmaT, samplingAlbedo, samplingGVal, scene, renderer);

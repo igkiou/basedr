@@ -25,9 +25,6 @@ mediumDimensions = [2.5; 100; 100];
 
 %% lighting directions
 
-% frontFlagSet = {[0; 0; 0; 0], [0; 0; 1; 1], [1; 1; 1; 1]};
-% rayAnglesSet = {[-5; -11.25; -22.5; -45], [-5; -22.5; 185; 202.5], [185; 191.25; 202.5; 225]};
-
 % frontFlag = 1 for frontlighting
 frontFlag = 0;
 rayAngle = deg2rad(-45);
@@ -50,8 +47,8 @@ maxPathlength = -1;
 %% image params
 
 viewPlane = [50; 50];
-pathlengthRange = [-1; -1];
-viewReso = [128; 128; 1];
+pathlengthRange = [0; 20];
+viewReso = [128; 128; 128];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% do not edit below here

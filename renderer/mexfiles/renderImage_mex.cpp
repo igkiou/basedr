@@ -107,8 +107,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 #else
 	mxClassID matClassID = mxSINGLE_CLASS;
 #endif
-	plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL); /* x */
+	if (viewReso.z == 1) {
+		plhs[0] = mxCreateNumericMatrix(viewReso.y, viewReso.x, matClassID, mxREAL);
+	} else {
+		mwSize dims[3];
+		dims[0] = viewReso.y;
+		dims[1] = viewReso.x;
+		dims[2] = viewReso.z;
+		plhs[0] = mxCreateNumericArray(static_cast<mwSize>(3), dims, matClassID, mxREAL);
+	}
 	Float *matImg = (Float *) mxGetData(plhs[0]);
-	img0.copyImage(matImg, viewReso.y * viewReso.x);
+	img0.copyImage(matImg, viewReso.y * viewReso.x * viewReso.z);
 	delete phase;
 }
