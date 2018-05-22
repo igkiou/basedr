@@ -43,7 +43,7 @@ viewAngle = deg2rad(0);
 viewOrigin = [0.0; 0.0];
 
 %% renderer options
-numPhotons = 1000000000;
+numPhotons = 10000000;
 maxDepth = -1;
 maxPathlength = -1;
 
